@@ -12,7 +12,7 @@
     "migrate-make": "npx knex migrate:make",
     "migrate-rollback": "npx knex migrate:rollback",
     "migrate-latest": "npx knex migrate:latest",
-    "migrate-update": "migrate-rollback && migrate-latest",
+    "migrate-update": "npx knex migrate:rollback && npx knex migrate:latest",
     "seed": "npx knex seed:run"
   },
   "repository": {
