@@ -45,4 +45,6 @@ const formatComments = (comments, articlesRows) => {
   return formattedComments;
 };
 
-module.exports = { formatArticles, formatComments, getArticleIds };
+module.exports = {
+  formatArticles, formatComments, getArticleIds, getArticleId,
+};
