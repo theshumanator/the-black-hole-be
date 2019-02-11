@@ -4,7 +4,7 @@ exports.up = function (knex, Promise) {
   return knex.schema.createTable('articles', (articlesTable) => {
     articlesTable.increments('article_id').primary();
     articlesTable.string('title').notNullable();
-    articlesTable.string('body').notNullable(); // or text??
+    articlesTable.text('body').notNullable();
     articlesTable.string('votes').notNullable().defaultTo(0);
     articlesTable.string('topic').notNullable().references('slug').inTable('topics'); // ref slug in topics
     articlesTable.string('author').notNullable().references('username').inTable('users'); // ref username in users
