@@ -8,7 +8,7 @@ exports.getAllTopics = (req, res, next) => {
         .catch(error => {
             console.log(error);
             const err = {status: 404, msg: error};
-            res.status(404).json(err);
+            next(err);
         })
 };
 
@@ -20,6 +20,6 @@ exports.postTopic = (req, res, next) => {
         .catch(error => {
             console.log(error);
             const err = {status: 404, msg: error};
-            res.status(404).json(err);
+            next(err);
         });
 };
