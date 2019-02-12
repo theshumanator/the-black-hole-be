@@ -10,8 +10,9 @@ const getArticleIds = articlesRows => articlesRows.map((articleRow) => {
 });
 
 const getArticleId = (title, articleIdList) => {
-  const article = articleIdList.filter(articlesRow => articlesRow.title === title);
-  if (article.length > 0) {
+  
+  const article = articleIdList.filter(articlesRow => articlesRow.title === title);  
+  if (article.length > 0) {    
     return article[0].article_id;
   }
   return -1;
@@ -28,20 +29,20 @@ const formatArticles = (articles) => {
 const formatComments = (comments, articlesRows) => {
   const formattedComments = [];
   comments.forEach((comment) => {
-    const epochTime = comment.created_at;
-    comment.created_at = convertFromEpoch(epochTime);
-
-    const author = comment.created_by;
-    delete comment.created_by;
-    comment.author = author;
-
     const article_id = getArticleId(comment.belongs_to, articlesRows);
     if (article_id !== -1) {
-      delete comment.belongs_to;
-      comment.article_id = article_id;
-      formattedComments.push(comment);
+      const newComment = {};    
+      const epochTime = comment.created_at;
+      comment.created_at = convertFromEpoch(epochTime);
+      newComment['created_at']=convertFromEpoch(epochTime);
+      newComment['article_id']=article_id;
+      newComment['author']=comment['created_by'];
+      newComment['body']=comment['body'];
+      newComment['votes']=comment['votes'];
+
+      formattedComments.push(newComment); 
     }
-  });
+  });  
   return formattedComments;
 };
 

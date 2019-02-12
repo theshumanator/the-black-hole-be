@@ -26,8 +26,6 @@ exports.updateCommentVote = (req, res, next) => {
             //console.log(comment_id, voteDirection)             
             modifyVote(comment_id, voteDirection)
                 .then((results) => {
-                    console.log('Got results')
-
                     if (results.length===0) {
                         const err = {status: 404, msg: 'null'};
                         next(err)

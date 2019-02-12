@@ -75,21 +75,8 @@ describe('End point tests', () => {
 
 
     describe('PATCH /api/comments/:comment_id', () => { 
-
-        /* it('Returns status 200 with an array of user objects with appropriate keys', () => {
-            return request
-                .get('/api/comments')
-                .expect(200)
-                .then((res) => {
-                    const users = res.body; 
-                    console.log(users[0]);  
-                })
-        }); */
-
-
         const increaseVote = { inc_votes : 1 };
         const decreaseVote = { inc_votes : -5 };
-
         const comment = { comment_id: 1,
             author: 'butter_bridge',
             article_id: 9,
@@ -111,8 +98,6 @@ describe('End point tests', () => {
                         expect(updatedComment['votes']).to.equal(newVote);
                     });
             });
-
-           
 
             it('Returns 201 with the updated comment object with new decreased votes', () => {
                 const newVote = 11;
