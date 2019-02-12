@@ -155,7 +155,41 @@ describe('End point tests', () => {
     });
     
     describe('PATCH /api/articles/:article_id', () => {
+        const increaseVote = { inc_votes : 1 };
+        const decreaseVote = { inc_votes : -5 };
     
+        it('Returns 202 with the updated article object with new increased  votes', () => {        
+            const newVote = 101;
+            return request
+                .patch('/api/articles/1')
+                .send(increaseVote)
+                .expect(202)
+                .then((res) => {                    
+                    const updatedArticle = res.body[0];
+                    expect(updatedArticle['article_id']).to.equal(1);
+                    expect(updatedArticle['votes']).to.equal(newVote);
+                });
+        });
+
+        it('Returns 202 with the updated article object with new decreased  votes', () => {
+            const newVote = 95;
+            return request
+                .patch('/api/articles/1')
+                .send(decreaseVote)
+                .expect(202)
+                .then((res) => {                             
+                    const updatedArticle = res.body[0];
+                    expect(updatedArticle['article_id']).to.equal(1);
+                    expect(updatedArticle['votes']).to.equal(newVote);
+                });
+        });
+
+            it('Returns 404 when updating a non-existent article', () => {              
+                return request
+                    .patch('/api/articles/1232323')
+                    .send(decreaseVote)
+                    .expect(404);
+            });
     });
     
     describe('DELETE /api/articles/:article_id', () => {
@@ -201,7 +235,8 @@ describe('End point tests', () => {
                     });
             });
 
-            it('Returns 404 when updating a non-existent comment', () => {              return request
+            it('Returns 404 when updating a non-existent comment', () => {              
+                return request
                     .patch('/api/comments/1232323')
                     .send(decreaseVote)
                     .expect(404);
