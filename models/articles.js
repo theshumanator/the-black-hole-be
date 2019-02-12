@@ -52,8 +52,18 @@ const removeArticle = (article_id) => {
         })
 };
 
-const fetchCommentsForArticle = () => {
+const fetchCommentsForArticle = (userQuery, article_id) => {
+    //console.log(userQuery, article_id)
+    const  {        
+        sort_by= 'c.created_at',
+        order= 'desc'} = userQuery;
 
+        //console.log(sort_by, order);
+    return connection
+        .select('c.comment_id', 'c.votes', 'c.created_at', 'c.author', 'c.body' )
+        .from('comments as c')
+        .where('c.article_id', article_id)     
+        .orderBy(sort_by, order)
 };
 
 const postCommentForArticle = () => {

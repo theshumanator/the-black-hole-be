@@ -8,7 +8,7 @@ articlesRouter.get('/:article_id', getArticleById);
 articlesRouter.patch('/:article_id', updateArticleVote);
 articlesRouter.delete('/:article_id', deleteArticle);
 
-articlesRouter.get('/:article_id', getCommentsForArticle);
-articlesRouter.post('/:article_id', postCommentForarticle);
+articlesRouter.get('/:article_id/comments', getCommentsForArticle);
+articlesRouter.post('/:article_id/comments', postCommentForarticle);
 
 module.exports=articlesRouter;

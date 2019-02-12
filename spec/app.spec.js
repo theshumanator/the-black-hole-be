@@ -201,6 +201,41 @@ describe('End point tests', () => {
         });
     });
 
+    describe('GET /api/articles/:article_id/comments', () => {
+        it('Returns the comments of a given article id with reqd keys', () => {
+            return request
+                .get('/api/articles/1/comments')
+                .expect(200)
+                .then((res) => {
+                    const articles = res.body;
+                    expect(articles).to.be.an('array');
+                    expect(articles[0]).to.be.an('object');  
+                    expect(articles[0]).to.contain.keys('comment_id', 'votes', 'author', 'created_at','body');  
+                });
+        });
+        it('Returns the comments of a given article id with reqd keys in reqired order', () => {
+            return request
+                .get('/api/articles/1/comments?sort_by=comment_id&order=asc')
+                .expect(200)
+                .then((res) => {
+                    const articles = res.body;
+                    expect(articles).to.be.an('array');
+                    expect(articles[0]).to.be.an('object');  
+                    expect(articles[0]).to.contain.keys('comment_id', 'votes', 'author', 'created_at','body');  
+                    expect(articles[0].comment_id).to.be.lessThan(articles[1].comment_id)
+                });
+        });
+        it('Returns 404 when fetching comments for article that has no comments', () => {              
+            return request
+                .get('/api/articles/1232323')                
+                .expect(404);
+        });
+    });
+
+    describe('POST /api/articles/:article_id/comments', () => {
+
+    });
+
 
     describe('PATCH /api/comments/:comment_id', () => { 
         const increaseVote = { inc_votes : 1 };
