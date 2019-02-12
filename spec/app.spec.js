@@ -192,8 +192,13 @@ describe('End point tests', () => {
             });
     });
     
+    //TODO do a check to see if article_id is still there?
     describe('DELETE /api/articles/:article_id', () => {
-    
+        it('Returns 204 after it deletes an article', () => {
+            return request
+                .delete('/api/articles/1')
+                .expect(204);
+        });
     });
 
 
@@ -242,7 +247,9 @@ describe('End point tests', () => {
                     .expect(404);
             });
     });
-    
+
+
+    //TODO do a check to see if comment_id is still there?
     describe('DELETE /api/comments/:comment_id', () => {
         it('Returns 204 after it deletes a comment', () => {
             return request
