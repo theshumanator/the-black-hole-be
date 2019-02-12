@@ -233,9 +233,35 @@ describe('End point tests', () => {
     });
 
     describe('POST /api/articles/:article_id/comments', () => {
-
+        const commentObj = {
+            username: 'butter_bridge',
+            body: 'Tacocat is so cool!'
+        };
+        it('Returns 200 and posted comment for existing article', () => {
+            return request
+                .post('/api/articles/1/comments')
+                .send(commentObj)
+                .expect(201)
+                .then((res) => {
+                    const newComment = res.body;
+                    expect(newComment[0].article_id).to.equal(1);
+                    expect(newComment[0].body).to.equal(commentObj.body);
+                    expect(newComment[0].author).to.equal(commentObj.username);
+                });
+        });
+        it('Returns 404 when posting comments for non-existent user', () => {              
+            return request
+                .post('/api/articles/1')                
+                .send(commentObj)
+                .expect(404);
+        });
+        it('Returns 404 when posting comments for non-existent article', () => {              
+            return request
+                .post('/api/articles/1232323')                
+                .send(commentObj)
+                .expect(404);
+        });
     });
-
 
     describe('PATCH /api/comments/:comment_id', () => { 
         const increaseVote = { inc_votes : 1 };

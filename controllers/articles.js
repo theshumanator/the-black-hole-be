@@ -1,4 +1,4 @@
-const {fetchAllArticles, insertArticle, modifyVote, removeArticle, fetchCommentsForArticle, postCommentForArticle} = require('../models/articles');
+const {fetchAllArticles, insertArticle, modifyVote, removeArticle, fetchCommentsForArticle, insertCommentForArticle} = require('../models/articles');
 
 const getArticles = (req, res, next) => {
     fetchAllArticles(req.query)
@@ -121,9 +121,41 @@ const getCommentsForArticle = (req, res, next) => {
             })
     }
 };
-const postCommentForarticle = (req, res, next) => {
-    
+const postCommentForArticle = (req, res, next) => {
+    if (!('article_id' in req.params)) {
+        const err = {status: 400, msg: 'Bad Request. the article id must be provided in the url like: api/articles/123/comments'};
+        next (err);
+    } else {           
+        if (!('username' in req.body) || !('body' in req.body)) {
+            const err = {status: 400, msg: 'Bad Request. JSON needs a username and body'};
+            next (err);
+        } else {
+            const article_id=+req.params.article_id;  
+            
+            const commentObj = {
+                body: req.body.body,
+                author: req.body.username,
+                article_id: article_id
+            };
+            insertCommentForArticle(commentObj)
+                .then((results) => {
+                    console.log('Got results')
+                    if (results.length===0) {
+                        const err = {status: 404, msg: 'null'};
+                        next(err)
+                    } else {
+                        res.status(201).json(results);              
+                    }
+                    
+                })
+                .catch(error => {
+                    console.log('Got error ' + error);
+                    const err = {status: 404, msg: error};
+                    next(err);
+                })
+        }
+    }
 };
-module.exports = {getArticles, postArticle, getArticleById, updateArticleVote, deleteArticle,getCommentsForArticle,postCommentForarticle} ;
+module.exports = {getArticles, postArticle, getArticleById, updateArticleVote, deleteArticle,getCommentsForArticle,postCommentForArticle} ;
 
 

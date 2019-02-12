@@ -66,8 +66,11 @@ const fetchCommentsForArticle = (userQuery, article_id) => {
         .orderBy(sort_by, order)
 };
 
-const postCommentForArticle = () => {
+const insertCommentForArticle = (commentObj) => {
+    return connection('comments')
+        .insert(commentObj)
+        .returning('*');
 
 };
 
-module.exports = {fetchAllArticles, insertArticle, modifyVote, removeArticle, fetchCommentsForArticle, postCommentForArticle};
+module.exports = {fetchAllArticles, insertArticle, modifyVote, removeArticle, fetchCommentsForArticle, insertCommentForArticle};
