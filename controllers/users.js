@@ -5,10 +5,9 @@ exports.getAllUsers = (req, res, next) => {
         .then(results => {
             res.status(200).json(results);
         })
-        .catch(error => {
-            console.log(error);
+        .catch(error => {                        
             const err = {status: 404, msg: error};
-            res.status(404).json(err);
+            next(err)
         })
 };
 
@@ -16,7 +15,8 @@ exports.getUser = (req, res, next) => {
     findUser(req.params)
         .then(results => {
             if (results.length===0) {
-                res.status(404).json(null);
+                const err = {status: 404, msg: 'null'};
+                next(err)
             } else {
                 res.status(200).json(results);
             }
@@ -25,7 +25,7 @@ exports.getUser = (req, res, next) => {
         .catch(error => {
             console.log(error);
             const err = {status: 404, msg: error};
-            res.status(404).json(err);
+            next(err)
         })
 };
 
@@ -37,6 +37,6 @@ exports.postUser = (req, res, next) => {
         .catch(error => {
             console.log(error);
             const err = {status: 404, msg: error};
-            res.status(404).json(err);
+            next(err)
         });
 };
