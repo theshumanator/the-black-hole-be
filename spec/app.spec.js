@@ -54,11 +54,85 @@ describe('End point tests', () => {
     });
     
     describe('GET /api/articles', () => {
-    
+
+        it('Returns all articles with comment count and other keys if no query is provided', () => {
+            return request
+                .get('/api/articles?author=butter_bridge&order=asc')
+                .expect(200)
+                .then((res) => {
+                    const articles = res.body;
+                    expect(articles).to.be.an('array');
+                    expect(articles[0]).to.be.an('object');  
+                    expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');  
+            })
+        });
+         it('Returns articles for given author', () => {
+            return request
+            .get('/api/articles?author=butter_bridge')
+            .expect(200)
+            .then((res) => {
+                const articles = res.body;
+                expect(articles).to.be.an('array');
+                expect(articles[0]).to.be.an('object');  
+                expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');  
+                expect(articles[0].author).to.equal('butter_bridge');
+            });
+        });
+        it('Returns no articles for non-existent topic', () => {
+            return request
+            .get('/api/articles?topic=wiii')
+            .expect(200)
+            .then((res) => {
+                const articles = res.body;
+                expect(articles.length).to.equal(0);
+            });
+        });
+
+        it('Returns articles sorted as request', () => {
+            return request
+            .get('/api/articles?sort-by=article_id&order=desc')
+            .expect(200)
+            .then((res) => {
+                const articles = res.body;
+                expect(articles).to.be.an('array');
+                expect(articles[0].article_id).to.be.lessThan(articles[1].article_id)
+            });
+        });
+        
     });
     
     describe('POST /api/articles', () => {
-    
+        it('Returns posted article when posting an article', () => {
+            const article = {
+                title: 'Something funny',
+                body: 'Hey there. I am supposed to be funny.',
+                topic: 'mitch',                
+                username: 'butter_bridge'};
+            return request
+                .post('/api/articles')
+                .send(article)
+                .expect(201)    
+                .then((res) => {
+                    const article = res.body;
+                    
+                    expect(article[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'topic');                      
+                    expect(article[0].author).to.equal('butter_bridge')
+                    expect(article[0].title).to.equal('Something funny')
+                });
+        });
+
+        it('Returns error when posting article with non existing user', () => {
+            const article = {
+                title: 'Something funny',
+                body: 'Hey there. I am supposed to be funny.',
+                topic: 'mitch',                
+                username: 'shumi'};
+            return request
+                .post('/api/articles')
+                .send(article)
+                .expect(404);
+        });
+
     });
     
     describe('GET /api/articles/:article_id', () => {

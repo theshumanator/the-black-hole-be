@@ -7,7 +7,7 @@ exports.getAllUsers = (req, res, next) => {
         })
         .catch(error => {                        
             const err = {status: 404, msg: error};
-            next(err)
+            next(err);
         })
 };
 

@@ -6,9 +6,9 @@ exports.up = function (knex, Promise) {
     articlesTable.string('title').notNullable();
     articlesTable.text('body').notNullable();
     articlesTable.string('votes').notNullable().defaultTo(0);
-    articlesTable.string('topic').notNullable().references('slug').inTable('topics'); // ref slug in topics
-    articlesTable.string('author').notNullable().references('username').inTable('users'); // ref username in users
-    articlesTable.datetime('created_at').notNullable();
+    articlesTable.string('topic').notNullable().references('slug').inTable('topics'); 
+    articlesTable.string('author').notNullable().references('username').inTable('users'); 
+    articlesTable.datetime('created_at').defaultTo(new Date().toISOString());
   });
 };
 

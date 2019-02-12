@@ -1,15 +1,4 @@
-const {modifyVote, removeComment, fetchAllComments} = require('../models/comments');
-
-exports.getAllComments = (req, res, next) => {
-    fetchAllComments()
-        .then(results => {
-            res.status(200).json(results);
-        })
-        .catch(error => {                        
-            const err = {status: 404, msg: error};
-            next(err)
-        })
-};
+const {modifyVote, removeComment} = require('../models/comments');
 
 exports.updateCommentVote = (req, res, next) => {
     
@@ -22,8 +11,7 @@ exports.updateCommentVote = (req, res, next) => {
             next (err);
         } else {
             const voteDirection = req.body.inc_votes;    
-            const comment_id=+req.params.comment_id;  
-            //console.log(comment_id, voteDirection)             
+            const comment_id=+req.params.comment_id;             
             modifyVote(comment_id, voteDirection)
                 .then((results) => {
                     if (results.length===0) {
@@ -40,8 +28,6 @@ exports.updateCommentVote = (req, res, next) => {
                 })
         }
     }
-    
-    
 }
 
 
