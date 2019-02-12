@@ -3,9 +3,11 @@ const {getArticles, postArticle, getArticleById, updateArticleVote, deleteArticl
 
 articlesRouter.get('/', getArticles);
 articlesRouter.post('/', postArticle);
-articlesRouter.patch('/:article_id', getArticleById);
+
+articlesRouter.get('/:article_id', getArticleById);
 articlesRouter.patch('/:article_id', updateArticleVote);
 articlesRouter.delete('/:article_id', deleteArticle);
+
 articlesRouter.get('/:article_id', getCommentsForArticle);
 articlesRouter.post('/:article_id', postCommentForarticle);
 

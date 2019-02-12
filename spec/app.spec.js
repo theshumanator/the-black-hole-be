@@ -136,7 +136,22 @@ describe('End point tests', () => {
     });
     
     describe('GET /api/articles/:article_id', () => {
-    
+        it('Returns the article object with appropriate keys for an existing article', () => {
+            return request
+                .get('/api/articles/1')
+                .expect(200)
+                .then((res) => {
+                    const article = res.body;
+                    expect(article[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');                      
+                    expect(article[0].article_id).to.equal(1)
+                })
+        });
+
+         it('Returns error for non-existent article', () => {
+            return request
+                .get('/api/articles/7368734378')
+                .expect(404);
+        }); 
     });
     
     describe('PATCH /api/articles/:article_id', () => {
