@@ -71,12 +71,7 @@ const modifyVote = (article_id, votes) => {
 };
 
 const removeArticle = (article_id) => {
-    return connection('comments')
-        .where('article_id', article_id)
-        .del()
-        .then(() => {
-            return connection('articles').where('article_id', article_id).del()
-        })
+        return connection('articles').where('article_id', article_id).del();
 };
 
 const fetchCommentsForArticle = (userQuery, article_id) => {    
