@@ -469,6 +469,7 @@ describe('End point tests', () => {
     });
 
     describe('/api/comments/:comment_id', () => {
+        
         describe('PATCH /api/comments/:comment_id', () => { 
             const increaseVote = { inc_votes : 1 };
             const decreaseVote = { inc_votes : -5 };
@@ -507,11 +508,31 @@ describe('End point tests', () => {
                         });
                 });
 
-                it('Returns 404 when updating a non-existent comment', () => {              
-                    return request
+                it('Returns 404 when updating a non-existent comment', () => {                  return request
                         .patch('/api/comments/1232323')
                         .send(decreaseVote)
-                        .expect(404);
+                        .expect(404)
+                        .then((res) => {
+                            expect(res.body.msg).to.equal(`The comment_id 1232323 does not exist.`)
+                        });
+                });
+                it('Returns 400 inc_votes is not sent', () => {                  
+                    return request
+                    .patch('/api/comments/1')
+                    .send({})
+                    .expect(400)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('The inc_votes must be provided and must be integer')
+                    });
+                });
+                it('Returns 400 inc_votes is not an integer', () => {                  
+                    return request
+                    .patch('/api/comments/1')
+                    .send({inc_votes: 'something'})
+                    .expect(400)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('The inc_votes must be provided and must be integer');
+                    });
                 });
         });
 
@@ -521,6 +542,15 @@ describe('End point tests', () => {
                 return request
                     .delete('/api/comments/1')
                     .expect(204);
+            });
+
+            it('Returns 404 error for non-existent comment id', () => {
+                return request
+                    .delete('/api/comments/3431')
+                    .expect(404)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('The comment_id 3431 does not exist.');
+                    });
             });
         });
 

@@ -10,7 +10,8 @@ const modifyVote = (comment_id, votes) => {
 const removeComment = (comment_id) => {
     return connection('comments')
         .where('comment_id', comment_id) 
-        .del();
+        .del()
+        .returning('*');
 }
 
 
