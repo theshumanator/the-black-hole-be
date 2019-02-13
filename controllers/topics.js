@@ -18,8 +18,7 @@ exports.postTopic = (req, res, next) => {
             res.status(201).json(results);
         })
         .catch(error => {
-            console.log(error);
-            const err = {status: 404, msg: error};
+            const err = {status: 400, msg: error.detail};
             next(err);
         });
 };

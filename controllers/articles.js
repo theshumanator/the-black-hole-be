@@ -45,8 +45,7 @@ const postArticle = (req, res, next) => {
             res.status(201).json(results);
         })
         .catch(error => {
-            console.log(error);
-            const err = {status: 404, msg: error};
+            const err = {status: 404, msg: error.detail};
             next(err);
         })
 };

@@ -76,6 +76,18 @@ describe('End point tests', () => {
                         expect(topic[0]).to.deep.equal(newTopic);
                     })
             });
+
+            it('Returns status 400 if topic slug already exists', () => {
+                const newTopic = {'slug': 'mitch', 'description': 'I am the slug master'};
+            return request
+                    .post('/api/topics')
+                    .send(newTopic)
+                    .expect(400)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Key (slug)=(mitch) already exists.');
+                    })
+            });
+
         }); 
         
         describe('DELETE /api/topics', () => {
@@ -188,7 +200,10 @@ describe('End point tests', () => {
                 return request
                     .post('/api/articles')
                     .send(article)
-                    .expect(404);
+                    .expect(404)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Key (author)=(shumi) is not present in table "users".');
+                    });
             });
     
         });       
@@ -204,6 +219,101 @@ describe('End point tests', () => {
         });
     });
 
+    describe('/api/articles/:article_id/comments', () => {
+        describe('GET /api/articles/:article_id/comments', () => {
+            it('Returns the comments of a given article id with reqd keys', () => {
+                return request
+                    .get('/api/articles/1/comments')
+                    .expect(200)
+                    .then((res) => {
+                        const articles = res.body;
+                        expect(articles).to.be.an('array');
+                        expect(articles[0]).to.be.an('object');  
+                        expect(articles[0]).to.contain.keys('comment_id', 'votes', 'author', 'created_at','body');  
+                    });
+            });
+            it('Returns the comments of a given article id with reqd keys in reqired order', () => {
+                return request
+                    .get('/api/articles/1/comments?sort_by=comment_id&order=asc')
+                    .expect(200)
+                    .then((res) => {
+                        const articles = res.body;
+                        expect(articles).to.be.an('array');
+                        expect(articles[0]).to.be.an('object');  
+                        expect(articles[0]).to.contain.keys('comment_id', 'votes', 'author', 'created_at','body');  
+                        expect(articles[0].comment_id).to.be.lessThan(articles[1].comment_id)
+                    });
+            });
+    
+            it('Returns top 3 comments of a given article id', () => {
+                return request
+                .get('/api/articles/1/comments?sort_by=comment_id&order=asc&limit=3')
+                .expect(200)
+                .then((res) => {
+                    const articles = res.body;
+                    expect(articles.length).to.equal(3)
+                    expect(articles[0].comment_id).to.equal(2);
+                    expect(articles[1].comment_id).to.equal(3);
+                    expect(articles[2].comment_id).to.equal(4);
+                });
+            });
+    
+            it('Returns second 3 comments of a given article id', () => {
+                return request
+                .get('/api/articles/1/comments?sort_by=comment_id&order=asc&limit=3&p=2')
+                .expect(200)
+                .then((res) => {
+                    const articles = res.body;
+                    expect(articles.length).to.equal(3)
+                    expect(articles[0].comment_id).to.equal(5);
+                    expect(articles[1].comment_id).to.equal(6);
+                    expect(articles[2].comment_id).to.equal(7);
+                });
+            });
+    
+            it('Returns 404 when fetching comments for article that has no comments', () => {              
+                return request
+                    .get('/api/articles/1232323')                
+                    .expect(404);
+            });
+        });
+    
+        describe('POST /api/articles/:article_id/comments', () => {
+            const commentObj = {
+                username: 'butter_bridge',
+                body: 'Tacocat is so cool!'
+            };
+    
+            it('Returns 200 and posted comment for existing article', () => {
+                return request
+                    .post('/api/articles/1/comments')
+                    .send(commentObj)
+                    .expect(201)
+                    .then((res) => {
+                        const newComment = res.body;
+                        expect(newComment[0].article_id).to.equal(1);
+                        expect(newComment[0].body).to.equal(commentObj.body);
+                        expect(newComment[0].author).to.equal(commentObj.username);
+                    });
+            });
+            it('Returns 404 when posting comments for non-existent user', () => {              
+                const comment = {
+                    username: 'butter_x_bridge',
+                    body: 'Tacocat is so cool!'
+                };
+                return request
+                    .post('/api/articles/1/comments')                
+                    .send(comment)
+                    .expect(404);
+            });
+            it('Returns 404 when posting comments for non-existent article', () => {              
+                return request
+                    .post('/api/articles/1232323/comments')                
+                    .send(commentObj)
+                    .expect(404);
+            });
+        });            
+    })
     describe('/api/articles/:article_id', () => {
 
         describe('GET /api/articles/:article_id', () => {
@@ -270,100 +380,6 @@ describe('End point tests', () => {
                     .delete('/api/articles/1')
                     .expect(204);
             });
-        });
-    });
-
-    describe('GET /api/articles/:article_id/comments', () => {
-        it('Returns the comments of a given article id with reqd keys', () => {
-            return request
-                .get('/api/articles/1/comments')
-                .expect(200)
-                .then((res) => {
-                    const articles = res.body;
-                    expect(articles).to.be.an('array');
-                    expect(articles[0]).to.be.an('object');  
-                    expect(articles[0]).to.contain.keys('comment_id', 'votes', 'author', 'created_at','body');  
-                });
-        });
-        it('Returns the comments of a given article id with reqd keys in reqired order', () => {
-            return request
-                .get('/api/articles/1/comments?sort_by=comment_id&order=asc')
-                .expect(200)
-                .then((res) => {
-                    const articles = res.body;
-                    expect(articles).to.be.an('array');
-                    expect(articles[0]).to.be.an('object');  
-                    expect(articles[0]).to.contain.keys('comment_id', 'votes', 'author', 'created_at','body');  
-                    expect(articles[0].comment_id).to.be.lessThan(articles[1].comment_id)
-                });
-        });
-
-        it('Returns top 3 comments of a given article id', () => {
-            return request
-            .get('/api/articles/1/comments?sort_by=comment_id&order=asc&limit=3')
-            .expect(200)
-            .then((res) => {
-                const articles = res.body;
-                expect(articles.length).to.equal(3)
-                expect(articles[0].comment_id).to.equal(2);
-                expect(articles[1].comment_id).to.equal(3);
-                expect(articles[2].comment_id).to.equal(4);
-            });
-        });
-
-        it('Returns second 3 comments of a given article id', () => {
-            return request
-            .get('/api/articles/1/comments?sort_by=comment_id&order=asc&limit=3&p=2')
-            .expect(200)
-            .then((res) => {
-                const articles = res.body;
-                expect(articles.length).to.equal(3)
-                expect(articles[0].comment_id).to.equal(5);
-                expect(articles[1].comment_id).to.equal(6);
-                expect(articles[2].comment_id).to.equal(7);
-            });
-        });
-
-        it('Returns 404 when fetching comments for article that has no comments', () => {              
-            return request
-                .get('/api/articles/1232323')                
-                .expect(404);
-        });
-    });
-
-    describe('POST /api/articles/:article_id/comments', () => {
-        const commentObj = {
-            username: 'butter_bridge',
-            body: 'Tacocat is so cool!'
-        };
-
-        it('Returns 200 and posted comment for existing article', () => {
-            return request
-                .post('/api/articles/1/comments')
-                .send(commentObj)
-                .expect(201)
-                .then((res) => {
-                    const newComment = res.body;
-                    expect(newComment[0].article_id).to.equal(1);
-                    expect(newComment[0].body).to.equal(commentObj.body);
-                    expect(newComment[0].author).to.equal(commentObj.username);
-                });
-        });
-        it('Returns 404 when posting comments for non-existent user', () => {              
-            const comment = {
-                username: 'butter_x_bridge',
-                body: 'Tacocat is so cool!'
-            };
-            return request
-                .post('/api/articles/1/comments')                
-                .send(comment)
-                .expect(404);
-        });
-        it('Returns 404 when posting comments for non-existent article', () => {              
-            return request
-                .post('/api/articles/1232323/comments')                
-                .send(commentObj)
-                .expect(404);
         });
     });
 
@@ -475,6 +491,7 @@ describe('End point tests', () => {
             });
         });
     });
+    
     describe('/api/users/:username', () => {
         describe('GET /api/users/:username', () => {
             it('Returns status 200 with the user object for given username', () => {
@@ -489,10 +506,14 @@ describe('End point tests', () => {
                     })
             });
 
-            it('Returns status 404 and null if user is not found', () => {   return request
+            it('Returns status 404 and error if user is not found', () => {   return request
                     .get('/api/users/butter_bridg3e')
-                    .expect(404)              
+                    .expect(404) 
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('User does not exist with username butter_bridg3e');
+                    })             
             });
+
         });
         describe('POST /api/users/:username', () => {
             it('Returns with 405 and unhandled method error', () => {
@@ -504,8 +525,7 @@ describe('End point tests', () => {
             });
             });
         });
-    });        
-    
-      
+    });            
+
 });
 
