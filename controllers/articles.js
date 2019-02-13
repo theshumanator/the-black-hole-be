@@ -62,7 +62,7 @@ const getArticleById = (req, res, next) => {
     fetchAllArticles(req.params)
     .then(articles => {
         if (articles.length===0) {
-            const err = {status: 404, msg: 'null'};
+            const err = {status: 404, msg: `Article does not exist for given article id: ${req.params.article_id}`};
             next(err)
         } else {
             res.status(200).json({articles});
@@ -77,8 +77,8 @@ const getArticleById = (req, res, next) => {
 };
 
 const updateArticleVote = (req, res, next) => {
-    if (!('inc_votes' in req.body)) {
-        const err = {status: 400, msg: 'Bad Request. inc_votes must be provided'};
+    if (!('inc_votes' in req.body) || !(+req.body.inc_votes)) {
+        const err = {status: 400, msg: 'Bad Request. inc_votes must be provided and must be an integer'};
         next (err);
     } else {
         if (!('article_id' in req.params)) {
@@ -90,7 +90,7 @@ const updateArticleVote = (req, res, next) => {
             modifyVote(article_id, voteDirection)
                 .then((articles) => {
                     if (articles.length===0) {
-                        const err = {status: 404, msg: 'null'};
+                        const err = {status: 404, msg: `Article does not exist for given article id: ${req.params.article_id}`};
                         next(err)
                     } else {
                         res.status(202).json({articles});
@@ -106,8 +106,8 @@ const updateArticleVote = (req, res, next) => {
 };
 
 const deleteArticle = (req, res, next) => {
-    if (!('article_id' in req.params)) {
-        const err = {status: 400, msg: 'Bad Request. the article id must be provided in the url like: api/articles/123'};
+    if (!('article_id' in req.params) || !(+req.params.article_id)) {
+        const err = {status: 400, msg: 'The article id must be an integer and provided in the url like: api/articles/123'};
         next (err);
     } else {   
         const article_id=+req.params.article_id;  

@@ -101,6 +101,7 @@ describe('End point tests', () => {
             });
         });
     })
+    
     describe('/api/articles', () => {
         
         describe('GET /api/articles', () => {
@@ -254,6 +255,7 @@ describe('End point tests', () => {
             });
     
         });       
+        
         describe('PATCH /api/articles', () => {
             it('Returns with 405 and unhandled method error', () => {
             return request
@@ -379,7 +381,10 @@ describe('End point tests', () => {
             it('Returns error for non-existent article', () => {
                 return request
                     .get('/api/articles/73687')
-                    .expect(404);
+                    .expect(404)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Article does not exist for given article id: 73687');
+                    });
             }); 
         });
         
@@ -387,7 +392,7 @@ describe('End point tests', () => {
             const increaseVote = { inc_votes : 1 };
             const decreaseVote = { inc_votes : -5 };
         
-            it('Returns 202 with the updated article object with new increased  votes', () => {        
+            it('Returns 202 with the updated article object with new increased votes', () => {        
                 const newVote = 101;
                 return request
                     .patch('/api/articles/1')
@@ -400,7 +405,7 @@ describe('End point tests', () => {
                     });
             });
 
-            it('Returns 202 with the updated article object with new decreased  votes', () => {
+            it('Returns 202 with the updated article object with new decreased votes', () => {
                 const newVote = 95;
                 return request
                     .patch('/api/articles/1')
@@ -412,13 +417,37 @@ describe('End point tests', () => {
                         expect(updatedArticle[0]['votes']).to.equal(newVote);
                     });
             });
+            
+            it('Returns 404 when updating a non-existent article', () => {             
+                return request
+                    .patch('/api/articles/1232323')
+                    .send(decreaseVote)
+                    .expect(404)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Article does not exist for given article id: 1232323');
+                    });
+            });
 
-                it('Returns 404 when updating a non-existent article', () => {              
-                    return request
-                        .patch('/api/articles/1232323')
-                        .send(decreaseVote)
-                        .expect(404);
-                });
+            it('Returns 400 error for article vote update without inc_votes', () => {             
+                return request
+                    .patch('/api/articles/1')
+                    .send({})
+                    .expect(400)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Bad Request. inc_votes must be provided and must be an integer');
+                    });
+            });
+
+            it('Returns 400 error for article vote set to non-integer', () => {             
+                return request
+                    .patch('/api/articles/1')
+                    .send({inc_votes: 'wii'})
+                    .expect(400)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Bad Request. inc_votes must be provided and must be an integer');
+                    });
+            });
+
         });
         
         //TODO do a check to see if article_id is still there?
@@ -428,6 +457,14 @@ describe('End point tests', () => {
                     .delete('/api/articles/1')
                     .expect(204);
             });
+            it('Returns 400 for non-integer article id', () => {
+                return request
+                    .delete('/api/articles/hola')
+                    .expect(400)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('The article id must be an integer and provided in the url like: api/articles/123')
+                    });
+            });            
         });
     });
 
