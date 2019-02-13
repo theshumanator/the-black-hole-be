@@ -537,6 +537,7 @@ describe('End point tests', () => {
     });
 
     describe('/api/users', () => {
+        
         describe('GET /api/users', () => {
             it('Returns status 200 with an array of user objects with appropriate keys', () => {
                 return request
@@ -564,7 +565,31 @@ describe('End point tests', () => {
                         expect(user[0]).to.deep.equal(newUser);
                     })
             });
+
+            it('Returns error 400 for json without username', () => {
+                const newUser = {'avatar_url': 'https://wwww.someurl.com', 'name': 'shumi'};
+            return request
+                    .post('/api/users')
+                    .send(newUser)
+                    .expect(400)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('The username is missing in json.');
+                    })
+            });
+
+            it('Returns 400 error for posting a username that already exist', () => {
+                const newUser = {'username': 'butter_bridge', 'avatar_url': 'https://wwww.someurl.com', 'name': 'shumi'};
+            return request
+                    .post('/api/users')
+                    .send(newUser)
+                    .expect(422)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Key (username)=(butter_bridge) already exists.');
+                        
+                    })
+            });
         });
+        
         describe('PATCH /api/users', () => {
             it('Returns with 405 and unhandled method error', () => {
             return request

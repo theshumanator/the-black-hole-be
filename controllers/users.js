@@ -29,13 +29,23 @@ exports.getUser = (req, res, next) => {
 };
 
 exports.postUser = (req, res, next) => {
-    insertNewUser(req.body)
-        .then(users => {            
-            res.status(201).json({users});
+    if(!('username' in req.body)){
+        const err = {status: 400, msg: 'The username is missing in json.'};
+        next(err);
+    } else {
+        insertNewUser(req.body)
+        .then(users => {
+            if(users.length===0) {
+                const err = {status: 422, msg: 'Could not insert the user. Contact support'};
+                next(err)
+            } else {
+                res.status(201).json({users});
+            }           
+            
         })
         .catch(error => {
-            console.log(error);
-            const err = {status: 404, msg: error};
+            const err = {status: 422, msg: error.detail};
             next(err)
         });
+    }    
 };
