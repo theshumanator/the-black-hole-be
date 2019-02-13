@@ -55,7 +55,7 @@ describe('End point tests', () => {
                     .get('/api/topics')
                     .expect(200)
                     .then((res) => {
-                        const topics = res.body; 
+                        const topics = res.body.topics; 
                         expect(topics).to.be.an('array');
                         expect(topics[0]).to.be.an('object');  
                         expect(topics[0]).to.contain.keys('slug', 'description');  
@@ -71,7 +71,7 @@ describe('End point tests', () => {
                     .send(newTopic)
                     .expect(201)
                     .then((res) => {
-                        const topic = res.body;
+                        const topic = res.body.topics;
                         expect(topic).to.have.length(1);
                         expect(topic[0]).to.deep.equal(newTopic);
                     })
@@ -107,8 +107,8 @@ describe('End point tests', () => {
                 return request
                     .get('/api/articles?author=butter_bridge')
                     .expect(200)
-                    .then((res) => {
-                        const articles = res.body;
+                    .then((res) => {                        
+                        const articles = res.body.articles;
                         expect(articles).to.be.an('array');
                         expect(articles[0]).to.be.an('object');  
                         expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');  
@@ -126,7 +126,7 @@ describe('End point tests', () => {
                 .get('/api/articles?sort-by=article_id&order=desc')
                 .expect(200)
                 .then((res) => {
-                    const articles = res.body;
+                    const articles = res.body.articles;
                     expect(articles).to.be.an('array');
                     expect(articles[0].article_id).to.be.lessThan(articles[1].article_id)
                 });
@@ -137,7 +137,7 @@ describe('End point tests', () => {
                     .get('/api/articles?author=butter_bridge&limit=2')
                     .expect(200)
                     .then((res) => {
-                        const articles = res.body;
+                        const articles = res.body.articles;
                         expect(articles.length).to.equal(2);                
                         expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');  
                         expect(articles[0].author).to.equal('butter_bridge');
@@ -150,7 +150,7 @@ describe('End point tests', () => {
                     .get('/api/articles?author=butter_bridge&limit=2&p=2')
                     .expect(200)
                     .then((res) => {
-                        const articles = res.body;
+                        const articles = res.body.articles;
                         expect(articles.length).to.equal(1);                
                         expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');  
                         expect(articles[0].author).to.equal('butter_bridge');
@@ -162,7 +162,7 @@ describe('End point tests', () => {
                     .get('/api/articles?author=butter_bridge&limit=2&p=2')
                     .expect(200)
                     .then((res) => {
-                        const articles = res.body;
+                        const articles = res.body.articles;
                         expect(articles.length).to.equal(1);                
                         expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count', 'total_count');  
                         expect(articles[0].author).to.equal('butter_bridge');
@@ -183,7 +183,7 @@ describe('End point tests', () => {
                     .send(article)
                     .expect(201)    
                     .then((res) => {
-                        const article = res.body;
+                        const article = res.body.articles;
                         
                         expect(article[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'topic');                      
                         expect(article[0].author).to.equal('butter_bridge')
@@ -226,7 +226,7 @@ describe('End point tests', () => {
                     .get('/api/articles/1/comments')
                     .expect(200)
                     .then((res) => {
-                        const articles = res.body;
+                        const articles = res.body.articles;
                         expect(articles).to.be.an('array');
                         expect(articles[0]).to.be.an('object');  
                         expect(articles[0]).to.contain.keys('comment_id', 'votes', 'author', 'created_at','body');  
@@ -237,7 +237,7 @@ describe('End point tests', () => {
                     .get('/api/articles/1/comments?sort_by=comment_id&order=asc')
                     .expect(200)
                     .then((res) => {
-                        const articles = res.body;
+                        const articles = res.body.articles;
                         expect(articles).to.be.an('array');
                         expect(articles[0]).to.be.an('object');  
                         expect(articles[0]).to.contain.keys('comment_id', 'votes', 'author', 'created_at','body');  
@@ -250,7 +250,7 @@ describe('End point tests', () => {
                 .get('/api/articles/1/comments?sort_by=comment_id&order=asc&limit=3')
                 .expect(200)
                 .then((res) => {
-                    const articles = res.body;
+                    const articles = res.body.articles;
                     expect(articles.length).to.equal(3)
                     expect(articles[0].comment_id).to.equal(2);
                     expect(articles[1].comment_id).to.equal(3);
@@ -263,7 +263,7 @@ describe('End point tests', () => {
                 .get('/api/articles/1/comments?sort_by=comment_id&order=asc&limit=3&p=2')
                 .expect(200)
                 .then((res) => {
-                    const articles = res.body;
+                    const articles = res.body.articles;
                     expect(articles.length).to.equal(3)
                     expect(articles[0].comment_id).to.equal(5);
                     expect(articles[1].comment_id).to.equal(6);
@@ -290,7 +290,7 @@ describe('End point tests', () => {
                     .send(commentObj)
                     .expect(201)
                     .then((res) => {
-                        const newComment = res.body;
+                        const newComment = res.body.comments;
                         expect(newComment[0].article_id).to.equal(1);
                         expect(newComment[0].body).to.equal(commentObj.body);
                         expect(newComment[0].author).to.equal(commentObj.username);
@@ -314,6 +314,7 @@ describe('End point tests', () => {
             });
         });            
     })
+    
     describe('/api/articles/:article_id', () => {
 
         describe('GET /api/articles/:article_id', () => {
@@ -322,7 +323,7 @@ describe('End point tests', () => {
                     .get('/api/articles/1')
                     .expect(200)
                     .then((res) => {
-                        const article = res.body;
+                        const article = res.body.articles;
                         expect(article[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');                      
                         expect(article[0].article_id).to.equal(1)
                     })
@@ -346,9 +347,9 @@ describe('End point tests', () => {
                     .send(increaseVote)
                     .expect(202)
                     .then((res) => {                    
-                        const updatedArticle = res.body[0];
-                        expect(updatedArticle['article_id']).to.equal(1);
-                        expect(updatedArticle['votes']).to.equal(newVote);
+                        const updatedArticle = res.body.articles;
+                        expect(updatedArticle[0]['article_id']).to.equal(1);
+                        expect(updatedArticle[0]['votes']).to.equal(newVote);
                     });
             });
 
@@ -359,9 +360,9 @@ describe('End point tests', () => {
                     .send(decreaseVote)
                     .expect(202)
                     .then((res) => {                             
-                        const updatedArticle = res.body[0];
-                        expect(updatedArticle['article_id']).to.equal(1);
-                        expect(updatedArticle['votes']).to.equal(newVote);
+                        const updatedArticle = res.body.articles;
+                        expect(updatedArticle[0]['article_id']).to.equal(1);
+                        expect(updatedArticle[0]['votes']).to.equal(newVote);
                     });
             });
 
@@ -403,9 +404,9 @@ describe('End point tests', () => {
                         .send(increaseVote)
                         .expect(202)
                         .then((res) => {                    
-                            const updatedComment = res.body[0];
-                            expect(updatedComment['comment_id']).to.equal(comment['comment_id']);
-                            expect(updatedComment['votes']).to.equal(newVote);
+                            const updatedComment = res.body.comments;
+                            expect(updatedComment[0]['comment_id']).to.equal(comment['comment_id']);
+                            expect(updatedComment[0]['votes']).to.equal(newVote);
                         });
                 });
 
@@ -416,9 +417,9 @@ describe('End point tests', () => {
                         .send(decreaseVote)
                         .expect(202)
                         .then((res) => {                             
-                            const updatedComment = res.body[0];
-                            expect(updatedComment['comment_id']).to.equal(comment['comment_id']);
-                            expect(updatedComment['votes']).to.equal(newVote);
+                            const updatedComment = res.body.comments;
+                            expect(updatedComment[0]['comment_id']).to.equal(comment['comment_id']);
+                            expect(updatedComment[0]['votes']).to.equal(newVote);
                         });
                 });
 
@@ -458,7 +459,7 @@ describe('End point tests', () => {
                     .get('/api/users')
                     .expect(200)
                     .then((res) => {
-                        const users = res.body; 
+                        const users = res.body.users; 
                         expect(users).to.be.an('array');
                         expect(users[0]).to.be.an('object');  
                         expect(users[0]).to.contain.keys('username', 'avatar_url', 'name');  
@@ -474,7 +475,7 @@ describe('End point tests', () => {
                     .send(newUser)
                     .expect(201)
                     .then((res) => {
-                        const user = res.body;
+                        const user = res.body.users;
                         expect(user).to.have.length(1);
                         expect(user[0]).to.deep.equal(newUser);
                     })
@@ -500,7 +501,7 @@ describe('End point tests', () => {
                     .get('/api/users/butter_bridge')
                     .expect(200)
                     .then((res) => {
-                        const user = res.body;
+                        const user = res.body.users;
                         expect(user).to.have.length(1);
                         expect(user[0]).to.deep.equal(expectedUser);
                     })

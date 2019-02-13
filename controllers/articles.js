@@ -9,12 +9,13 @@ const getArticles = (req, res, next) => {
             } else {
                 articleCount = result[0].total_count;            
             fetchAllArticles(req.query)
-                .then(queryResult => {
-                    if (queryResult.length===0) {
+                .then(articles => {
+                    if (articles.length===0) {
                         const err = {status: 404, msg: 'null'};
                         next(err);
                     } else {
-                        queryResult[0]['total_count']=+articleCount;  res.status(200).json(queryResult);
+                        articles[0]['total_count']=+articleCount;  
+                        res.status(200).json({articles});
                     }                    
                 })
                 .catch(error => {
@@ -41,8 +42,8 @@ const postArticle = (req, res, next) => {
         articleObj['author'] = req.body.username;
     }
     insertArticle(articleObj)
-        .then(results => {
-            res.status(201).json(results);
+        .then(articles => {
+            res.status(201).json({articles});
         })
         .catch(error => {
             const err = {status: 404, msg: error.detail};
@@ -52,12 +53,12 @@ const postArticle = (req, res, next) => {
 
 const getArticleById = (req, res, next) => {
     fetchAllArticles(req.params)
-    .then(results => {
-        if (results.length===0) {
+    .then(articles => {
+        if (articles.length===0) {
             const err = {status: 404, msg: 'null'};
             next(err)
         } else {
-            res.status(200).json(results);
+            res.status(200).json({articles});
         }
         
     })
@@ -80,12 +81,12 @@ const updateArticleVote = (req, res, next) => {
             const voteDirection = req.body.inc_votes;    
             const article_id=+req.params.article_id;             
             modifyVote(article_id, voteDirection)
-                .then((results) => {
-                    if (results.length===0) {
+                .then((articles) => {
+                    if (articles.length===0) {
                         const err = {status: 404, msg: 'null'};
                         next(err)
                     } else {
-                        res.status(202).json(results);
+                        res.status(202).json({articles});
                     }                                        
                 })
                 .catch(error => {
@@ -122,12 +123,12 @@ const getCommentsForArticle = (req, res, next) => {
     } else {   
         const article_id=+req.params.article_id;  
         fetchCommentsForArticle(req.query, article_id)
-            .then((results) => {
-                if (results.length===0) {
+            .then((articles) => {
+                if (articles.length===0) {
                     const err = {status: 404, msg: 'null'};
                     next(err)
                 } else {
-                    res.status(200).json(results);              
+                    res.status(200).json({articles});              
                 }
                 
             })
@@ -155,12 +156,12 @@ const postCommentForArticle = (req, res, next) => {
                 article_id: article_id
             };
             insertCommentForArticle(commentObj)
-                .then((results) => {
-                    if (results.length===0) {
+                .then((comments) => {
+                    if (comments.length===0) {
                         const err = {status: 404, msg: 'null'};
                         next(err)
                     } else {
-                        res.status(201).json(results);              
+                        res.status(201).json({comments});              
                     }
                     
                 })

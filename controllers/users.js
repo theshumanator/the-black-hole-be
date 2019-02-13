@@ -2,8 +2,8 @@ const {fetchAllUsers, insertNewUser, findUser} = require('../models/users');
 
 exports.getAllUsers = (req, res, next) => {
     fetchAllUsers()
-        .then(results => {
-            res.status(200).json(results);
+        .then(users => {
+            res.status(200).json({users});
         })
         .catch(error => {                        
             const err = {status: 404, msg: error};
@@ -13,12 +13,12 @@ exports.getAllUsers = (req, res, next) => {
 
 exports.getUser = (req, res, next) => {       
     findUser(req.params)
-    .then(results => {
-        if (results.length===0) {
+    .then(users => {
+        if (users.length===0) {
             const err = {status: 404, msg: `User does not exist with username ${req.params.username}`};
             next(err)
         } else {
-            res.status(200).json(results);
+            res.status(200).json({users});
         }        
     })
     .catch(error => {
@@ -30,8 +30,8 @@ exports.getUser = (req, res, next) => {
 
 exports.postUser = (req, res, next) => {
     insertNewUser(req.body)
-        .then(results => {            
-            res.status(201).json(results);
+        .then(users => {            
+            res.status(201).json({users});
         })
         .catch(error => {
             console.log(error);

@@ -2,8 +2,8 @@ const {fetchAllTopics, insertNewTopic} = require('../models/topics');
 
 exports.getAllTopics = (req, res, next) => {
     fetchAllTopics()
-        .then(results => {
-            res.status(200).json(results);
+        .then(topics => {
+            res.status(200).json({topics});
         })
         .catch(error => {
             console.log(error);
@@ -14,8 +14,8 @@ exports.getAllTopics = (req, res, next) => {
 
 exports.postTopic = (req, res, next) => {
     insertNewTopic(req.body)
-        .then(results => {            
-            res.status(201).json(results);
+        .then(topics => {            
+            res.status(201).json({topics});
         })
         .catch(error => {
             const err = {status: 400, msg: error.detail};

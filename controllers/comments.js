@@ -13,12 +13,12 @@ exports.updateCommentVote = (req, res, next) => {
             const voteDirection = req.body.inc_votes;    
             const comment_id=+req.params.comment_id;             
             modifyVote(comment_id, voteDirection)
-                .then((results) => {
-                    if (results.length===0) {
+                .then((comments) => {
+                    if (comments.length===0) {
                         const err = {status: 404, msg: 'null'};
                         next(err)
                     } else {
-                        res.status(202).json(results);
+                        res.status(202).json({comments});
                     }                                        
                 })
                 .catch(error => {
