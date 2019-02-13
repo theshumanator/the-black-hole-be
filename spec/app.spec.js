@@ -631,7 +631,7 @@ describe('End point tests', () => {
             return request
                     .post('/api/users')
                     .send(newUser)
-                    .expect(422)
+                    .expect(400)
                     .then((res) => {
                         expect(res.body.msg).to.equal('Key (username)=(butter_bridge) already exists.');
                         

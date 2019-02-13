@@ -1,4 +1,5 @@
 const {fetchAllTopics, insertNewTopic} = require('../models/topics');
+const {sqlErrorMap} = require('../utils/common-res');
 
 exports.getAllTopics = (req, res, next) => {
     fetchAllTopics()
@@ -6,8 +7,7 @@ exports.getAllTopics = (req, res, next) => {
             res.status(200).json({topics});
         })
         .catch(error => {
-            console.log(error);
-            const err = {status: 404, msg: error};
+            const err = {status: sqlErrorMap[error.code]||404, msg: error.detail};
             next(err);
         })
 };
@@ -24,7 +24,8 @@ exports.postTopic = (req, res, next) => {
             }  
         })
         .catch(error => {
-            const err = {status: 400, msg: error.detail};
+            console.log(error.code);
+            const err = {status: sqlErrorMap[error.code]||422, msg: error.detail};
             next(err);
         });
 };

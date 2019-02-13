@@ -1,5 +1,7 @@
 const {fetchAllArticles, getArticleCount, insertArticle, modifyVote, removeArticle, fetchCommentsForArticle, insertCommentForArticle} = require('../models/articles');
 
+const {sqlErrorMap} = require('../utils/common-res');
+
 const getArticles = (req, res, next) => {
     getArticleCount(req.query)
         .then(result => {
@@ -11,7 +13,7 @@ const getArticles = (req, res, next) => {
             fetchAllArticles(req.query)
                 .then(articles => {
                     if (articles.length===0) {
-                        const err = {status: 404, msg: 'null'};
+                        const err = {status: 404, msg: 'No articles available'};
                         next(err);
                     } else {
                         articles[0]['total_count']=+articleCount;  
@@ -19,15 +21,13 @@ const getArticles = (req, res, next) => {
                     }                    
                 })
                 .catch(error => {
-                    console.log(error);
-                    const err = {status: 404, msg: error};
+                    const err = {status: 404, msg: error.detail};
                     next(err);
                 })                
             }            
         })
-        .catch(error => {
-            console.log(error);
-            const err = {status: 404, msg: error};
+        .catch(error => {                    
+            const err = {status: sqlErrorMap[error.code] || 404, msg: error.detail};
             next(err);
         })
 };
@@ -58,7 +58,7 @@ const postArticle = (req, res, next) => {
                 }                
             })
             .catch(error => {
-                const err = {status: 404, msg: error.detail};
+                const err = {status: sqlErrorMap[error.code]||422, msg: error.detail};
                 next(err);
             })
     }
@@ -78,7 +78,7 @@ const getArticleById = (req, res, next) => {
     })
     .catch(error => {
         console.log(error);
-        const err = {status: 404, msg: error};
+        const err = {status: sqlErrorMap[error.code]||404, msg: error.detail};
         next(err)
     })
 };
@@ -105,8 +105,7 @@ const updateArticleVote = (req, res, next) => {
                     }                                        
                 })
                 .catch(error => {
-                    console.log('Got error: ');
-                    const err = {status: 404, msg: error};
+                    const err = {status: sqlErrorMap[error.code]||422, msg: error.detail};
                     next(err);
                 })
         }
@@ -124,8 +123,7 @@ const deleteArticle = (req, res, next) => {
                 res.status(204).send();
             })
             .catch(error => {
-                console.log('Got error ' + error);
-                const err = {status: 404, msg: error};
+                const err = {status: sqlErrorMap[error.code]||422, msg: error.detail};
                 next(err);
             })
     }
@@ -148,7 +146,7 @@ const getCommentsForArticle = (req, res, next) => {
                 
             })
             .catch(error => {
-                const err = {status: 404, msg: error.detail};
+                const err = {status: sqlErrorMap[error.code]||404, msg: error.detail};
                 next(err);
             })
     }
@@ -181,7 +179,7 @@ const postCommentForArticle = (req, res, next) => {
                     
                 })
                 .catch(error => {
-                    const err = {status: 404, msg: error.detail};
+                    const err = {status: sqlErrorMap[error.code]||422, msg: error.detail};
                     next(err);
                 })
         }

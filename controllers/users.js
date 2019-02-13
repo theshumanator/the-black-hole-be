@@ -1,4 +1,5 @@
 const {fetchAllUsers, insertNewUser, findUser} = require('../models/users');
+const {sqlErrorMap} = require('../utils/common-res');
 
 exports.getAllUsers = (req, res, next) => {
     fetchAllUsers()
@@ -6,7 +7,7 @@ exports.getAllUsers = (req, res, next) => {
             res.status(200).json({users});
         })
         .catch(error => {                        
-            const err = {status: 404, msg: error};
+            const err = {status: sqlErrorMap[error.code]||404, msg: error.detail};
             next(err);
         })
 };
@@ -23,8 +24,7 @@ exports.getUser = (req, res, next) => {
         }        
     })
     .catch(error => {
-        console.log(error);
-        const err = {status: 404, msg: error};
+        const err = {status: sqlErrorMap[error.code]||404, msg: error.detail};
         next(err)
     });
 };
@@ -46,7 +46,7 @@ exports.postUser = (req, res, next) => {
             
         })
         .catch(error => {
-            const err = {status: 422, msg: error.detail};
+            const err = {status: sqlErrorMap[error.code]||422, msg: error.detail};
             next(err)
         });
     }    

@@ -1,4 +1,5 @@
 const {modifyVote, removeComment} = require('../models/comments');
+const {sqlErrorMap} = require('../utils/common-res');
 
 exports.updateCommentVote = (req, res, next) => {
     
@@ -23,8 +24,7 @@ exports.updateCommentVote = (req, res, next) => {
                     }                                        
                 })
                 .catch(error => {
-                    console.log('Got error');
-                    const err = {status: 404, msg: error.detail};
+                    const err = {status: sqlErrorMap[error.code]||422, msg: error.detail};
                     next(err);
                 })
         }
@@ -48,8 +48,7 @@ exports.deleteComment = (req, res, next) => {
                 
             })
             .catch(error => {
-                console.log('Got error');
-                const err = {status: 404, msg: error.detail};
+                const err = {status: sqlErrorMap[error.code]||422, msg: error.detail};
                 next(err);
             })
     }
