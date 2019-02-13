@@ -248,6 +248,33 @@ describe('End point tests', () => {
                     expect(articles[0].comment_id).to.be.lessThan(articles[1].comment_id)
                 });
         });
+
+        it('Returns top 3 comments of a given article id', () => {
+            return request
+            .get('/api/articles/1/comments?sort_by=comment_id&order=asc&limit=3')
+            .expect(200)
+            .then((res) => {
+                const articles = res.body;
+                expect(articles.length).to.equal(3)
+                expect(articles[0].comment_id).to.equal(2);
+                expect(articles[1].comment_id).to.equal(3);
+                expect(articles[2].comment_id).to.equal(4);
+            });
+        });
+
+        it('Returns second 3 comments of a given article id', () => {
+            return request
+            .get('/api/articles/1/comments?sort_by=comment_id&order=asc&limit=3&p=2')
+            .expect(200)
+            .then((res) => {
+                const articles = res.body;
+                expect(articles.length).to.equal(3)
+                expect(articles[0].comment_id).to.equal(5);
+                expect(articles[1].comment_id).to.equal(6);
+                expect(articles[2].comment_id).to.equal(7);
+            });
+        });
+
         it('Returns 404 when fetching comments for article that has no comments', () => {              
             return request
                 .get('/api/articles/1232323')                

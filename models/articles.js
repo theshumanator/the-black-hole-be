@@ -79,18 +79,21 @@ const removeArticle = (article_id) => {
         })
 };
 
-const fetchCommentsForArticle = (userQuery, article_id) => {
-    //console.log(userQuery, article_id)
-    const  {        
+const fetchCommentsForArticle = (userQuery, article_id) => {    
+    const  {
+        limit = 10,
+        p = 1,        
         sort_by= 'c.created_at',
         order= 'desc'} = userQuery;
 
-        //console.log(sort_by, order);
+    const offset = ((p * limit) - limit);
     return connection
         .select('c.comment_id', 'c.votes', 'c.created_at', 'c.author', 'c.body' )
         .from('comments as c')
         .where('c.article_id', article_id)     
         .orderBy(sort_by, order)
+        .offset(offset)
+        .limit(limit)
 };
 
 const insertCommentForArticle = (commentObj) => {
