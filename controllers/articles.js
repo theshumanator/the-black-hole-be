@@ -32,23 +32,30 @@ const getArticles = (req, res, next) => {
         })
 };
 
-//TODO put a try here to handle if keys dont exist
 const postArticle = (req, res, next) => {
     const articleObj = {};
-    if (req.body) {
+    if ( !(req.body) || !('title' in req.body) || !('body' in req.body) || !('topic' in req.body) || !('username' in req.body)) {
+        const err = {status: 400, msg: 'Missing data in the json. JSON must include: title, body, topic and username'};
+        next(err);
+    } else {
         articleObj['title'] = req.body.title;
         articleObj['body'] = req.body.body;
         articleObj['topic'] = req.body.topic;
         articleObj['author'] = req.body.username;
+
+        if ('votes' in req.body && (+req.body.votes)) {
+            articleObj['votes'] = req.body.votes;
+        }
+        
+        insertArticle(articleObj)
+            .then(articles => {
+                res.status(201).json({articles});
+            })
+            .catch(error => {
+                const err = {status: 404, msg: error.detail};
+                next(err);
+            })
     }
-    insertArticle(articleObj)
-        .then(articles => {
-            res.status(201).json({articles});
-        })
-        .catch(error => {
-            const err = {status: 404, msg: error.detail};
-            next(err);
-        })
 };
 
 const getArticleById = (req, res, next) => {

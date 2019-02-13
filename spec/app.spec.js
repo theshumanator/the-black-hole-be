@@ -102,6 +102,7 @@ describe('End point tests', () => {
         });
     })
     describe('/api/articles', () => {
+        
         describe('GET /api/articles', () => {
             it('Returns all articles for a given author with all the reqd keys', () => {
                 return request
@@ -171,6 +172,7 @@ describe('End point tests', () => {
             });
             
         });
+        
         describe('POST /api/articles', () => {
             it('Returns posted article when posting an article', () => {
                 const article = {
@@ -191,7 +193,37 @@ describe('End point tests', () => {
                     });
             });
     
-            it('Returns error when posting article with non existing user', () => {
+            it('Returns 404 error when posting article with missing username', () => {
+                const article = {
+                    title: 'Something funny',
+                    body: 'Hey there. I am supposed to be funny.',
+                    topic: 'mitch'};
+                return request
+                    .post('/api/articles')
+                    .send(article)
+                    .expect(400)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Missing data in the json. JSON must include: title, body, topic and username');
+                    });
+            });
+
+            it('Ignores the votes if the value is not an integer', () => {
+                const article = {
+                    title: 'Something funny',
+                    body: 'Hey there. I am supposed to be funny.',
+                    topic: 'mitch',
+                    votes: 'abc',
+                    username: 'butter_bridge'};
+                return request
+                    .post('/api/articles')
+                    .send(article)
+                    .expect(201)
+                    .then((res) => {
+                        expect(res.body.articles[0].votes).to.equal(0);
+                    });
+            });
+
+            it('Returns 404 error when posting article with non existing user', () => {
                 const article = {
                     title: 'Something funny',
                     body: 'Hey there. I am supposed to be funny.',
@@ -203,6 +235,21 @@ describe('End point tests', () => {
                     .expect(404)
                     .then((res) => {
                         expect(res.body.msg).to.equal('Key (author)=(shumi) is not present in table "users".');
+                    });
+            });
+
+            it('Returns 404 error when posting article with non existing topic', () => {
+                const article = {
+                    title: 'Something funny',
+                    body: 'Hey there. I am supposed to be funny.',
+                    topic: 'shumi',                
+                    username: 'butter_bridge'};
+                return request
+                    .post('/api/articles')
+                    .send(article)
+                    .expect(404)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Key (topic)=(shumi) is not present in table "topics".');
                     });
             });
     
