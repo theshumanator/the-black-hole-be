@@ -18,7 +18,8 @@ exports.updateCommentVote = (req, res, next) => {
                         const err = {status: 404, msg: `The comment_id ${comment_id} does not exist.`};
                         next(err)
                     } else {
-                        res.status(202).json({comments});
+                        const comment = comments[0];
+                        res.status(202).json({comment});
                     }                                        
                 })
                 .catch(error => {

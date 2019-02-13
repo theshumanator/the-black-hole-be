@@ -18,7 +18,8 @@ exports.getUser = (req, res, next) => {
             const err = {status: 404, msg: `User does not exist with username ${req.params.username}`};
             next(err)
         } else {
-            res.status(200).json({users});
+            const user=users[0];         
+            res.status(200).json({user});
         }        
     })
     .catch(error => {
@@ -39,7 +40,8 @@ exports.postUser = (req, res, next) => {
                 const err = {status: 422, msg: 'Could not insert the user. Contact support'};
                 next(err)
             } else {
-                res.status(201).json({users});
+                const user=users[0];         
+                res.status(201).json({user});
             }           
             
         })

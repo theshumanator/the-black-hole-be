@@ -49,7 +49,13 @@ const postArticle = (req, res, next) => {
         
         insertArticle(articleObj)
             .then(articles => {
-                res.status(201).json({articles});
+                if(articles.length===0) {
+                    const err = {status: 404, msg: "Could not insert article. Contact support"};
+                    next(err);
+                } else {
+                    const article = articles[0];
+                    res.status(201).json({article});
+                }                
             })
             .catch(error => {
                 const err = {status: 404, msg: error.detail};
@@ -65,7 +71,8 @@ const getArticleById = (req, res, next) => {
             const err = {status: 404, msg: `Article does not exist for given article id: ${req.params.article_id}`};
             next(err)
         } else {
-            res.status(200).json({articles});
+            const article = articles[0];
+            res.status(200).json({article});
         }
         
     })
@@ -93,7 +100,8 @@ const updateArticleVote = (req, res, next) => {
                         const err = {status: 404, msg: `Article does not exist for given article id: ${req.params.article_id}`};
                         next(err)
                     } else {
-                        res.status(202).json({articles});
+                        const article = articles[0];
+                        res.status(202).json({article});
                     }                                        
                 })
                 .catch(error => {
@@ -113,7 +121,7 @@ const deleteArticle = (req, res, next) => {
         const article_id=+req.params.article_id;  
         removeArticle(article_id)
             .then((results) => {
-                res.status(204).json(results);              
+                res.status(204).send();
             })
             .catch(error => {
                 console.log('Got error ' + error);
@@ -130,12 +138,12 @@ const getCommentsForArticle = (req, res, next) => {
     } else {   
         const article_id=+req.params.article_id;  
         fetchCommentsForArticle(req.query, article_id)
-            .then((articles) => {
-                if (articles.length===0) {
+            .then((comments) => {
+                if (comments.length===0) {
                     const err = {status: 404, msg:  `Article does not exist for given article id: ${article_id}`};
                     next(err)
                 } else {
-                    res.status(200).json({articles});              
+                    res.status(200).json({comments});              
                 }
                 
             })
@@ -167,7 +175,8 @@ const postCommentForArticle = (req, res, next) => {
                         const err = {status: 404, msg:  `Article does not exist for given article id: ${article_id}`};
                         next(err)
                     } else {
-                        res.status(201).json({comments});              
+                        const comment = comments[0];
+                        res.status(201).json({comment});              
                     }
                     
                 })

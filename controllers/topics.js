@@ -15,7 +15,13 @@ exports.getAllTopics = (req, res, next) => {
 exports.postTopic = (req, res, next) => {
     insertNewTopic(req.body)
         .then(topics => {            
-            res.status(201).json({topics});
+            if(topics.length===0) {
+                const err = {status: 422, msg: 'Could not insert the topic. Contact support'};
+                next(err)
+            } else {
+                const topic=topics[0];         
+                res.status(201).json({topic});
+            }  
         })
         .catch(error => {
             const err = {status: 400, msg: error.detail};
