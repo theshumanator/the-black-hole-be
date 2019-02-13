@@ -1,14 +1,21 @@
 const articlesRouter = require('express').Router();
 const {getArticles, postArticle, getArticleById, updateArticleVote, deleteArticle,getCommentsForArticle,postCommentForArticle} = require('../../controllers/articles');
+const {unhandledMethod} = require('../../utils/common-res');
 
-articlesRouter.get('/', getArticles);
-articlesRouter.post('/', postArticle);
+articlesRouter.route('/')
+    .get(getArticles)
+    .post(postArticle)
+    .all(unhandledMethod);
 
-articlesRouter.get('/:article_id', getArticleById);
-articlesRouter.patch('/:article_id', updateArticleVote);
-articlesRouter.delete('/:article_id', deleteArticle);
+articlesRouter.route('/:article_id')
+    .get(getArticleById)
+    .patch(updateArticleVote)
+    .delete(deleteArticle)
+    .all(unhandledMethod);
 
-articlesRouter.get('/:article_id/comments', getCommentsForArticle);
-articlesRouter.post('/:article_id/comments', postCommentForArticle);
+articlesRouter.route('/:article_id/comments')
+    .get(getCommentsForArticle)
+    .post(postCommentForArticle)
+    .all(unhandledMethod);
 
 module.exports=articlesRouter;

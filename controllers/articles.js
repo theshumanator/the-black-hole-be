@@ -11,7 +11,6 @@ const getArticles = (req, res, next) => {
             fetchAllArticles(req.query)
                 .then(queryResult => {
                     if (queryResult.length===0) {
-                        console.log('it is 0')
                         const err = {status: 404, msg: 'null'};
                         next(err);
                     } else {

@@ -40,7 +40,6 @@ exports.deleteComment = (req, res, next) => {
         const comment_id=+req.params.comment_id;  
         removeComment(comment_id)
             .then((results) => {
-                console.log('Got results')
                 res.status(204).json(results);              
             })
             .catch(error => {
