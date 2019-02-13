@@ -132,7 +132,7 @@ const getCommentsForArticle = (req, res, next) => {
         fetchCommentsForArticle(req.query, article_id)
             .then((articles) => {
                 if (articles.length===0) {
-                    const err = {status: 404, msg: 'null'};
+                    const err = {status: 404, msg:  `Article does not exist for given article id: ${article_id}`};
                     next(err)
                 } else {
                     res.status(200).json({articles});              
@@ -140,19 +140,18 @@ const getCommentsForArticle = (req, res, next) => {
                 
             })
             .catch(error => {
-                console.log('Got error ' + error);
-                const err = {status: 404, msg: error};
+                const err = {status: 404, msg: error.detail};
                 next(err);
             })
     }
 };
 const postCommentForArticle = (req, res, next) => {
     if (!('article_id' in req.params)) {
-        const err = {status: 400, msg: 'Bad Request. the article id must be provided in the url like: api/articles/123/comments'};
+        const err = {status: 400, msg: 'The article id must be provided in the url like: api/articles/123/comments'};
         next (err);
     } else {           
         if (!('username' in req.body) || !('body' in req.body)) {
-            const err = {status: 400, msg: 'Bad Request. JSON needs a username and body'};
+            const err = {status: 400, msg: 'JSON needs a username and body'};
             next (err);
         } else {
             const article_id=+req.params.article_id;  
@@ -165,7 +164,7 @@ const postCommentForArticle = (req, res, next) => {
             insertCommentForArticle(commentObj)
                 .then((comments) => {
                     if (comments.length===0) {
-                        const err = {status: 404, msg: 'null'};
+                        const err = {status: 404, msg:  `Article does not exist for given article id: ${article_id}`};
                         next(err)
                     } else {
                         res.status(201).json({comments});              
@@ -173,8 +172,7 @@ const postCommentForArticle = (req, res, next) => {
                     
                 })
                 .catch(error => {
-                    console.log('Got error ' + error);
-                    const err = {status: 404, msg: error};
+                    const err = {status: 404, msg: error.detail};
                     next(err);
                 })
         }

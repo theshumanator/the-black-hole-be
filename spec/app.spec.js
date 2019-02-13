@@ -269,6 +269,7 @@ describe('End point tests', () => {
     });
 
     describe('/api/articles/:article_id/comments', () => {
+        
         describe('GET /api/articles/:article_id/comments', () => {
             it('Returns the comments of a given article id with reqd keys', () => {
                 return request
@@ -322,8 +323,11 @@ describe('End point tests', () => {
     
             it('Returns 404 when fetching comments for article that has no comments', () => {              
                 return request
-                    .get('/api/articles/1232323')                
-                    .expect(404);
+                    .get('/api/articles/1232323/comments')                
+                    .expect(404)
+                    .then((res)=>{
+                        expect(res.body.msg).to.equal('Article does not exist for given article id: 1232323');                        
+                    });
             });
         });
     
@@ -345,6 +349,18 @@ describe('End point tests', () => {
                         expect(newComment[0].author).to.equal(commentObj.username);
                     });
             });
+            it('Returns 404 when posting comments without a body', () => {              
+                const comment = {
+                    username: 'butter_bridge'
+                };
+                return request
+                    .post('/api/articles/1/comments')                
+                    .send(comment)
+                    .expect(400)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('JSON needs a username and body'); 
+                    });
+            });
             it('Returns 404 when posting comments for non-existent user', () => {              
                 const comment = {
                     username: 'butter_x_bridge',
@@ -353,13 +369,19 @@ describe('End point tests', () => {
                 return request
                     .post('/api/articles/1/comments')                
                     .send(comment)
-                    .expect(404);
+                    .expect(404)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Key (author)=(butter_x_bridge) is not present in table "users".'); 
+                    });
             });
             it('Returns 404 when posting comments for non-existent article', () => {              
                 return request
                     .post('/api/articles/1232323/comments')                
                     .send(commentObj)
-                    .expect(404);
+                    .expect(404)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Key (article_id)=(1232323) is not present in table "articles".'); 
+                    });
             });
         });            
     })
