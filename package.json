@@ -7,7 +7,7 @@
     "test": "mocha spec/*app.spec.js",
     "lint": "eslint ./",
     "pre-commit": "npm t",
-    
+    "posttest": "npm run lint",
     "setup-dbs": "psql -f db/setup.sql",
     "migrate-make": "npx knex migrate:make",
     "migrate-rollback": "npx knex migrate:rollback",

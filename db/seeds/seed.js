@@ -15,9 +15,8 @@ exports.seed = function (knex, Promise) {
     })
     .then(([userRows, topicRows, articlesRows]) => {
       const articleIdList = getArticleIds(articlesRows);
-      const formattedComments = formatComments(commentData, articleIdList);      
+      const formattedComments = formatComments(commentData, articleIdList);
       return Promise.all([userRows, topicRows, articlesRows, knex('comments').insert(formattedComments).returning('*')]);
     })
     .catch(error => console.log(error));
 };
-
