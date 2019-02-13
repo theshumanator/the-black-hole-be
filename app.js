@@ -6,7 +6,7 @@ app.use(bodyParser.json());
 
 app.use('/api', apiRouter);
 
-app.use('/*', (req, res, next) => {
+app.all('/*', (req, res, next) => {
   const incorrectRoute = req.params['0'];
   const err = {
     status: 404,

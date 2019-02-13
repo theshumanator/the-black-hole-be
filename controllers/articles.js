@@ -1,9 +1,29 @@
-const {fetchAllArticles, insertArticle, modifyVote, removeArticle, fetchCommentsForArticle, insertCommentForArticle} = require('../models/articles');
+const {fetchAllArticles, getArticleCount, insertArticle, modifyVote, removeArticle, fetchCommentsForArticle, insertCommentForArticle} = require('../models/articles');
 
 const getArticles = (req, res, next) => {
-    fetchAllArticles(req.query)
-        .then(results => {
-            res.status(200).json(results);
+    getArticleCount(req.query)
+        .then(result => {
+            if (result.length===0){
+                const err = {status: 404, msg: 'null'};
+                next(err);
+            } else {
+                articleCount = result[0].total_count;            
+            fetchAllArticles(req.query)
+                .then(queryResult => {
+                    if (queryResult.length===0) {
+                        console.log('it is 0')
+                        const err = {status: 404, msg: 'null'};
+                        next(err);
+                    } else {
+                        queryResult[0]['total_count']=+articleCount;  res.status(200).json(queryResult);
+                    }                    
+                })
+                .catch(error => {
+                    console.log(error);
+                    const err = {status: 404, msg: error};
+                    next(err);
+                })                
+            }            
         })
         .catch(error => {
             console.log(error);
@@ -12,6 +32,7 @@ const getArticles = (req, res, next) => {
         })
 };
 
+//TODO put a try here to handle if keys dont exist
 const postArticle = (req, res, next) => {
     const articleObj = {};
     if (req.body) {
@@ -86,7 +107,6 @@ const deleteArticle = (req, res, next) => {
         const article_id=+req.params.article_id;  
         removeArticle(article_id)
             .then((results) => {
-                console.log('Got results')
                 res.status(204).json(results);              
             })
             .catch(error => {
@@ -105,7 +125,6 @@ const getCommentsForArticle = (req, res, next) => {
         const article_id=+req.params.article_id;  
         fetchCommentsForArticle(req.query, article_id)
             .then((results) => {
-                console.log('Got results')
                 if (results.length===0) {
                     const err = {status: 404, msg: 'null'};
                     next(err)
@@ -139,7 +158,6 @@ const postCommentForArticle = (req, res, next) => {
             };
             insertCommentForArticle(commentObj)
                 .then((results) => {
-                    console.log('Got results')
                     if (results.length===0) {
                         const err = {status: 404, msg: 'null'};
                         next(err)

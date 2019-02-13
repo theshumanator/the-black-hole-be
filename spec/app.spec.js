@@ -55,37 +55,22 @@ describe('End point tests', () => {
     
     describe('GET /api/articles', () => {
 
-        it('Returns all articles with comment count and other keys if no query is provided', () => {
+        it('Returns all articles for a given author with all the reqd keys', () => {
             return request
-                .get('/api/articles?author=butter_bridge&order=asc')
+                .get('/api/articles?author=butter_bridge')
                 .expect(200)
                 .then((res) => {
                     const articles = res.body;
                     expect(articles).to.be.an('array');
                     expect(articles[0]).to.be.an('object');  
                     expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');  
+                    expect(articles[0].author).to.equal('butter_bridge');
             })
-        });
-         it('Returns articles for given author', () => {
-            return request
-            .get('/api/articles?author=butter_bridge')
-            .expect(200)
-            .then((res) => {
-                const articles = res.body;
-                expect(articles).to.be.an('array');
-                expect(articles[0]).to.be.an('object');  
-                expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');  
-                expect(articles[0].author).to.equal('butter_bridge');
-            });
         });
         it('Returns no articles for non-existent topic', () => {
             return request
             .get('/api/articles?topic=wiii')
-            .expect(200)
-            .then((res) => {
-                const articles = res.body;
-                expect(articles.length).to.equal(0);
-            });
+            .expect(404);
         });
 
         it('Returns articles sorted as request', () => {
@@ -96,6 +81,44 @@ describe('End point tests', () => {
                 const articles = res.body;
                 expect(articles).to.be.an('array');
                 expect(articles[0].article_id).to.be.lessThan(articles[1].article_id)
+            });
+        });
+
+        it('Returns the first 2 articles for a given author', () => {
+            return request
+                .get('/api/articles?author=butter_bridge&limit=2')
+                .expect(200)
+                .then((res) => {
+                    const articles = res.body;
+                    expect(articles.length).to.equal(2);                
+                    expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');  
+                    expect(articles[0].author).to.equal('butter_bridge');
+                    expect(articles[1].author).to.equal('butter_bridge');
+            })
+        });
+
+        it('Returns the last article (given author has 3 articles) for a given author', () => {
+            return request
+                .get('/api/articles?author=butter_bridge&limit=2&p=2')
+                .expect(200)
+                .then((res) => {
+                    const articles = res.body;
+                    expect(articles.length).to.equal(1);                
+                    expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');  
+                    expect(articles[0].author).to.equal('butter_bridge');
+            });
+        });
+
+        it('Returns the total count for a given author regardless of limit/page', ()=>{
+            return request
+                .get('/api/articles?author=butter_bridge&limit=2&p=2')
+                .expect(200)
+                .then((res) => {
+                    const articles = res.body;
+                    expect(articles.length).to.equal(1);                
+                    expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count', 'total_count');  
+                    expect(articles[0].author).to.equal('butter_bridge');
+                    expect(articles[0].total_count).to.equal(3);
             });
         });
         
@@ -149,7 +172,7 @@ describe('End point tests', () => {
 
          it('Returns error for non-existent article', () => {
             return request
-                .get('/api/articles/7368734378')
+                .get('/api/articles/73687')
                 .expect(404);
         }); 
     });
