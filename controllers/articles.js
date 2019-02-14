@@ -170,10 +170,6 @@ const postCommentForArticle = (req, res, next) => {
       article_id,
     };
 
-    if ('votes' in req.body) {
-      commentObj.votes = req.body.votes;
-    }
-
     insertCommentForArticle(commentObj)
       .then((comments) => {
         if (comments.length === 0) {
