@@ -112,6 +112,7 @@ describe('End point tests', () => {
           expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');
           expect(articles[0].author).to.equal('butter_bridge');
         }));
+
       it('Returns no articles for non-existent topic', () => request
         .get('/api/articles?topic=wiii')
         .expect(404));
