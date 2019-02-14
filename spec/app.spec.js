@@ -118,12 +118,12 @@ describe('End point tests', () => {
         .expect(404));
 
       it('Returns articles sorted as request', () => request
-        .get('/api/articles?sort-by=article_id&order=desc')
+        .get('/api/articles?sort_by=article_id&order=desc')
         .expect(200)
         .then((res) => {
           const { articles } = res.body;
           expect(articles).to.be.an('array');
-          expect(articles[0].article_id).to.be.lessThan(articles[1].article_id);
+          expect(articles[0].article_id).to.be.greaterThan(articles[1].article_id);
         }));
 
       it('Returns the first 2 articles for a given author', () => request
