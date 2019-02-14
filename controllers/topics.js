@@ -13,6 +13,10 @@ exports.getAllTopics = (req, res, next) => {
 };
 
 exports.postTopic = (req, res, next) => {
+  if (!(req.body) || !('description' in req.body) || !('slug' in req.body)) {
+    const err = { status: 400, msg: 'Missing data in the json. JSON must include: slug and description' };
+    next(err);
+  }
   insertNewTopic(req.body)
     .then((topics) => {
       if (topics.length === 0) {

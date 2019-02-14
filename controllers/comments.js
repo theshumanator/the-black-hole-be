@@ -14,11 +14,12 @@ exports.updateCommentVote = (req, res, next) => {
     modifyVote(comment_id, voteDirection)
       .then((comments) => {
         if (comments.length === 0) {
+          // block review: changing from 400 to 404
           const err = { status: 404, msg: `The comment_id ${comment_id} does not exist.` };
           next(err);
         } else {
           const comment = comments[0];
-          res.status(202).json({ comment });
+          res.status(200).json({ comment });
         }
       })
       .catch((error) => {

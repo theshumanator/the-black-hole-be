@@ -2,6 +2,8 @@
 
 This application provides an API service to interact with the NC-Knews system (read/write). 
 
+To see what APIs are supported, click on: [API]()
+
 ## Getting Started
 
 ### Prerequisites
@@ -206,5 +208,5 @@ heroku open
 
 ## Acknowledgments
 
+* Hat tip to [Rory](https://github.com/resmithers) for his extra-ordinary sharp vision to spot bugs from 3 feet away
 * Northcoders
-* Rory github

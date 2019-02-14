@@ -67,7 +67,7 @@ describe('End point tests', () => {
           });
       });
 
-      it('Returns status 400 if topic slug already exists', () => {
+      it('Returns status 422 if topic slug already exists', () => {
         const newTopic = { slug: 'mitch', description: 'I am the slug master' };
         return request
           .post('/api/topics')
@@ -75,6 +75,28 @@ describe('End point tests', () => {
           .expect(422)
           .then((res) => {
             expect(res.body.msg).to.equal('Key (slug)=(mitch) already exists.');
+          });
+      });
+
+      it('Returns status 400 if description is not included in json', () => {
+        const newTopic = { slug: 'shumiSlug' };
+        return request
+          .post('/api/topics')
+          .send(newTopic)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).to.equal('Missing data in the json. JSON must include: slug and description');
+          });
+      });
+
+      it('Returns status 400 if slug is not included in json', () => {
+        const newTopic = { description: 'I am the slug master' };
+        return request
+          .post('/api/topics')
+          .send(newTopic)
+          .expect(400)
+          .then((res) => {
+            expect(res.body.msg).to.equal('Missing data in the json. JSON must include: slug and description');
           });
       });
     });
@@ -113,9 +135,15 @@ describe('End point tests', () => {
           expect(articles[0].author).to.equal('butter_bridge');
         }));
 
-      it('Returns no articles for non-existent topic', () => request
+      it('Returns all articles if topic does not exist', () => request
         .get('/api/articles?topic=wiii')
-        .expect(404));
+        .expect(200)
+        .then((res) => {
+          const { articles } = res.body;
+          expect(articles).to.be.an('array');
+          expect(articles[0]).to.be.an('object');
+          expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');
+        }));
 
       it('Returns articles sorted as request', () => request
         .get('/api/articles?sort_by=article_id&order=desc')
@@ -304,6 +332,13 @@ describe('End point tests', () => {
         .then((res) => {
           expect(res.body.msg).to.equal('Article does not exist for given article id: 1232323');
         }));
+
+      it('Returns 400 when fetching comments for invalid article id', () => request
+        .get('/api/articles/hola/comments')
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).to.equal('The article id must be provided in the url like: api/articles/123/comments and must be an integer');
+        }));
     });
 
     describe('POST /api/articles/:article_id/comments', () => {
@@ -364,7 +399,7 @@ describe('End point tests', () => {
         .expect(200)
         .then((res) => {
           const { article } = res.body;
-          expect(article).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');
+          expect(article).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count', 'body');
           expect(article.article_id).to.equal(1);
         }));
 
@@ -374,18 +409,25 @@ describe('End point tests', () => {
         .then((res) => {
           expect(res.body.msg).to.equal('Article does not exist for given article id: 73687');
         }));
+
+      it('Returns error for invalid article id (str instead of int)', () => request
+        .get('/api/articles/hola')
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).to.equal('Article id: hola must be an integer.');
+        }));
     });
 
     describe('PATCH /api/articles/:article_id', () => {
       const increaseVote = { inc_votes: 1 };
       const decreaseVote = { inc_votes: -5 };
 
-      it('Returns 202 with the updated article object with new increased votes', () => {
+      it('Returns 200 with the updated article object with new increased votes', () => {
         const newVote = 101;
         return request
           .patch('/api/articles/1')
           .send(increaseVote)
-          .expect(202)
+          .expect(200)
           .then((res) => {
             const updatedArticle = res.body.article;
             expect(updatedArticle.article_id).to.equal(1);
@@ -393,12 +435,12 @@ describe('End point tests', () => {
           });
       });
 
-      it('Returns 202 with the updated article object with new decreased votes', () => {
+      it('Returns 200 with the updated article object with new decreased votes', () => {
         const newVote = 95;
         return request
           .patch('/api/articles/1')
           .send(decreaseVote)
-          .expect(202)
+          .expect(200)
           .then((res) => {
             const updatedArticle = res.body.article;
             expect(updatedArticle.article_id).to.equal(1);
@@ -442,6 +484,12 @@ describe('End point tests', () => {
         .then((res) => {
           expect(res.body.msg).to.equal('The article id must be an integer and provided in the url like: api/articles/123');
         }));
+      it('Returns 400 for non existent int article id', () => request
+        .delete('/api/articles/12345')
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).to.equal('The article id 12345 does not exist in the database.');
+        }));
     });
   });
 
@@ -460,12 +508,12 @@ describe('End point tests', () => {
       };
 
 
-      it('Returns 201 with the updated comment object with new increased  votes', () => {
+      it('Returns 200 with the updated comment object with new increased  votes', () => {
         const newVote = 17;
         return request
           .patch('/api/comments/1')
           .send(increaseVote)
-          .expect(202)
+          .expect(200)
           .then((res) => {
             const updatedComment = res.body.comment;
             expect(updatedComment.comment_id).to.equal(comment.comment_id);
@@ -473,12 +521,12 @@ describe('End point tests', () => {
           });
       });
 
-      it('Returns 201 with the updated comment object with new decreased votes', () => {
+      it('Returns 200 with the updated comment object with new decreased votes', () => {
         const newVote = 11;
         return request
           .patch('/api/comments/1')
           .send(decreaseVote)
-          .expect(202)
+          .expect(200)
           .then((res) => {
             const updatedComment = res.body.comment;
             expect(updatedComment.comment_id).to.equal(comment.comment_id);
@@ -493,6 +541,7 @@ describe('End point tests', () => {
         .then((res) => {
           expect(res.body.msg).to.equal('The comment_id 1232323 does not exist.');
         }));
+
       it('Returns 400 inc_votes is not sent', () => request
         .patch('/api/comments/1')
         .send({})

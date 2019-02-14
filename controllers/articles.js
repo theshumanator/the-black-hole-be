@@ -8,23 +8,36 @@ const { sqlErrorMap } = require('../utils/common-res');
 
 const getArticles = (req, res, next) => {
   getArticleCount(req.query)
-    .then((result) => {
-      if (result.length === 0) {
-        const err = { status: 404, msg: 'null' };
+    .then((totalCount) => {
+      if (totalCount.length === 0) {
+        const err = { status: 404, msg: 'There are no articles in the database' };
         next(err);
       } else {
-        const articleCount = result[0].total_count;
+        const articleCount = totalCount[0].total_count;
         fetchAllArticles(req.query)
           .then((articles) => {
             if (articles.length === 0) {
+              /* block review expect it to be 200 not 404
               const err = { status: 404, msg: 'No articles available' };
-              next(err);
+              next(err); */
+              fetchAllArticles(req.query, true)
+                .then((allArticles) => {
+                  if (allArticles.length === 0) {
+                    const err = { status: 404, msg: 'There are no articles in the database' };
+                    next(err);
+                  } else {
+                    const articleObj = {
+                      articles: allArticles,
+                      total_count: +articleCount,
+                    };
+                    res.status(200).json(articleObj);
+                  }
+                });
             } else {
               const articleObj = {
                 articles,
                 total_count: +articleCount,
               };
-
               res.status(200).json(articleObj);
             }
           })
@@ -41,15 +54,15 @@ const getArticles = (req, res, next) => {
 };
 
 const postArticle = (req, res, next) => {
-  const articleObj = {};
   if (!(req.body) || !('title' in req.body) || !('body' in req.body) || !('topic' in req.body) || !('username' in req.body)) {
     const err = { status: 400, msg: 'Missing data in the json. JSON must include: title, body, topic and username' };
     next(err);
   } else {
-    articleObj.title = req.body.title;
-    articleObj.body = req.body.body;
-    articleObj.topic = req.body.topic;
-    articleObj.author = req.body.username;
+    const {
+      title, body, topic, username,
+    } = req.body;
+    const articleObj = { title, body, topic };
+    articleObj.author = username;
 
     if ('votes' in req.body && (+req.body.votes)) {
       articleObj.votes = req.body.votes;
@@ -73,20 +86,25 @@ const postArticle = (req, res, next) => {
 };
 
 const getArticleById = (req, res, next) => {
-  fetchAllArticleById(req.params)
-    .then((articles) => {
-      if (articles.length === 0) {
-        const err = { status: 404, msg: `Article does not exist for given article id: ${req.params.article_id}` };
+  if (!('article_id' in req.params) || !(+req.params.article_id)) {
+    const err = { status: 400, msg: `Article id: ${req.params.article_id} must be an integer.` };
+    next(err);
+  } else {
+    fetchAllArticleById(req.params)
+      .then((articles) => {
+        if (articles.length === 0) {
+          const err = { status: 404, msg: `Article does not exist for given article id: ${req.params.article_id}` };
+          next(err);
+        } else {
+          const article = articles[0];
+          res.status(200).json({ article });
+        }
+      })
+      .catch((error) => {
+        const err = { status: sqlErrorMap[error.code] || 404, msg: error.detail };
         next(err);
-      } else {
-        const article = articles[0];
-        res.status(200).json({ article });
-      }
-    })
-    .catch((error) => {
-      const err = { status: sqlErrorMap[error.code] || 404, msg: error.detail };
-      next(err);
-    });
+      });
+  }
 };
 
 const updateArticleVote = (req, res, next) => {
@@ -106,7 +124,8 @@ const updateArticleVote = (req, res, next) => {
           next(err);
         } else {
           const article = articles[0];
-          res.status(202).json({ article });
+          // block review: needs to be 200
+          res.status(200).json({ article });
         }
       })
       .catch((error) => {
@@ -123,8 +142,13 @@ const deleteArticle = (req, res, next) => {
   } else {
     const article_id = +req.params.article_id;
     removeArticle(article_id)
-      .then((results) => {
-        res.status(204).send();
+      .then((numberDeleted) => {
+        if (numberDeleted === 0) {
+          const err = { status: 404, msg: `The article id ${article_id} does not exist in the database.` };
+          next(err);
+        } else {
+          res.status(204).send();
+        }
       })
       .catch((error) => {
         const err = { status: sqlErrorMap[error.code] || 422, msg: error.detail };
@@ -134,8 +158,8 @@ const deleteArticle = (req, res, next) => {
 };
 
 const getCommentsForArticle = (req, res, next) => {
-  if (!('article_id' in req.params)) {
-    const err = { status: 400, msg: 'Bad Request. the article id must be provided in the url like: api/articles/123/comments' };
+  if (!('article_id' in req.params) || !(+req.params.article_id)) {
+    const err = { status: 400, msg: 'The article id must be provided in the url like: api/articles/123/comments and must be an integer' };
     next(err);
   } else {
     const article_id = +req.params.article_id;

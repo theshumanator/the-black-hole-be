@@ -1,36 +1,55 @@
 const connection = require('../db/connection');
 
-const fetchAllArticles = (userQuery) => {
-  const {
-    sort_by = 'a.created_at',
-    order = 'desc',
-    limit = 10,
-    p = 1,
-    ...queries
-  } = userQuery;
+const isValidSort = (sortBy) => {
+  const validArticleSort = ['article_id', 'title', 'topic', 'votes', 'author', 'created_at'];
+  return validArticleSort.includes(sortBy);
+};
 
-  const whereQuery = { ...queries };
-  const newWhereQuery = {};
-  const unionQuery = {};
+const isValidOrder = (order) => {
+  const validOrder = ['asc', 'desc'];
+  return validOrder.includes(order);
+};
 
-  if ('author' in whereQuery) {
-    newWhereQuery['a.author'] = whereQuery.author;
-    unionQuery['b.author'] = whereQuery.author;
+const fetchAllArticles = (userQuery, retry = false) => {
+  const limit = userQuery.limit || 10;
+  const p = userQuery.p || 1;
+  let sort_by = userQuery.sort_by || 'a.created_at';
+  let order = userQuery.order || 'desc';
+
+
+  const whereQuery = {};
+  // if it is a retry, dont include anything in the where clause
+  if (!retry) {
+    // TODO destrcture using reduce??
+    if ('author' in userQuery) {
+      whereQuery['a.author'] = userQuery.author;
+    }
+    if ('topic' in userQuery) {
+      whereQuery['a.topic'] = userQuery.topic;
+    }
+    if ('article_id' in userQuery) {
+      whereQuery['a.article_id'] = userQuery.article_id;
+    }
   }
-  if ('topic' in whereQuery) {
-    newWhereQuery['a.topic'] = whereQuery.topic;
-    unionQuery['b.topic'] = whereQuery.topic;
+
+
+  if (isValidSort(sort_by)) {
+    sort_by = `a.${sort_by}`;
+  } else {
+    sort_by = 'a.created_at';
   }
-  if ('article_id' in whereQuery) {
-    newWhereQuery['a.article_id'] = whereQuery.article_id;
-    unionQuery['b.article_id'] = whereQuery.article_id;
+
+  if (!isValidOrder(order)) {
+    order = 'desc';
   }
+
 
   const offset = ((p * limit) - limit);
   return connection
     .select('a.article_id', 'a.title', 'a.topic', 'a.votes', 'a.author', 'a.created_at')
     .from('articles as a')
-    .leftJoin('comments as c', 'c.article_id', 'a.article_id').where(newWhereQuery)
+    .leftJoin('comments as c', 'c.article_id', 'a.article_id')
+    .where(whereQuery)
     .count('c.comment_id as comment_count')
     .groupBy('a.article_id')
     .orderBy(sort_by, order)
@@ -39,36 +58,39 @@ const fetchAllArticles = (userQuery) => {
 };
 
 const fetchAllArticleById = (userQuery) => {
-  const {
-    sort_by = 'a.created_at',
-    order = 'desc',
-    limit = 10,
-    p = 1,
-    ...queries
-  } = userQuery;
+  const limit = userQuery.limit || 10;
+  const p = userQuery.p || 1;
+  let sort_by = userQuery.sort_by || 'a.created_at';
+  let order = userQuery.order || 'desc';
 
-  const whereQuery = { ...queries };
-  const newWhereQuery = {};
-  const unionQuery = {};
+  const whereQuery = { };
+  if ('author' in userQuery) {
+    whereQuery['a.author'] = userQuery.author;
+  }
+  if ('topic' in userQuery) {
+    whereQuery['a.topic'] = userQuery.topic;
+  }
+  if ('article_id' in userQuery) {
+    whereQuery['a.article_id'] = userQuery.article_id;
+  }
 
-  if ('author' in whereQuery) {
-    newWhereQuery['a.author'] = whereQuery.author;
-    unionQuery['b.author'] = whereQuery.author;
+
+  if (isValidSort(sort_by)) {
+    sort_by = `a.${sort_by}`;
+  } else {
+    sort_by = 'a.created_at';
   }
-  if ('topic' in whereQuery) {
-    newWhereQuery['a.topic'] = whereQuery.topic;
-    unionQuery['b.topic'] = whereQuery.topic;
-  }
-  if ('article_id' in whereQuery) {
-    newWhereQuery['a.article_id'] = whereQuery.article_id;
-    unionQuery['b.article_id'] = whereQuery.article_id;
+
+  if (!isValidOrder(order)) {
+    order = 'desc';
   }
 
   const offset = ((p * limit) - limit);
   return connection
     .select('a.article_id', 'a.title', 'a.topic', 'a.votes', 'a.author', 'a.created_at', 'a.body')
     .from('articles as a')
-    .leftJoin('comments as c', 'c.article_id', 'a.article_id').where(newWhereQuery)
+    .leftJoin('comments as c', 'c.article_id', 'a.article_id')
+    .where(whereQuery)
     .count('c.comment_id as comment_count')
     .groupBy('a.article_id')
     .orderBy(sort_by, order)

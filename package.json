@@ -31,19 +31,19 @@
   },
   "homepage": "https://github.com/northcoders/BE2-NC-Knews#readme",
   "dependencies": {
-    "body-parser": "^1.18.3",
-    "chai": "^4.2.0",
+    "body-parser": "^1.18.3",    
     "express": "^4.16.4",
     "knex": "^0.15.2",
-    "mocha": "^5.2.0",    
-    "pg": "^7.8.0",
-    "supertest": "^3.4.2"
+    "pg": "^7.8.0"
   },
   "devDependencies": {
     "eslint": "^5.9.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.14.0",
     "nodemon": "^1.18.10",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",    
+    "supertest": "^3.4.2",
     "husky": "^1.1.4"
   }
 }
