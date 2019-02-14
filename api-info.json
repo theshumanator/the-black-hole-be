@@ -1,0 +1,33 @@
+{  
+    "Topics: /api/topics":{  
+       "GET":"Returns all valid topics",
+       "POST":"Given a json of slug and description, creates a topic if it does not exist"
+    },
+    "Articles: /api/articles":{  
+       "GET":"Gets all articles (without body). Can filter by author and topic.",
+       "POST":"Given a json with title, body, topic and username, creates an article"
+    },
+    "Article: /api/articles/:article_id":{  
+       "GET":"Returns info on given article. Includes comment count",
+       "PATCH":"Given a json with inc_votes, updates the in/decrements the votes of the given article_id",
+       "DELETE":"Deletes an article and all its associated comments"
+    },
+    "Comments of article: /api/articles/:article_id/comments":{  
+       "GET":"Gets all comments for a given article. Include sort_by + order and limit + p to decide on sorting (default is created_at) and number of comments you want + page",
+       "POST":"Inserts a comment for a given article"
+    },
+    "Comments: /api/comments/:comment_id":{  
+       "PATCH":"Given a json with inc_votes, updates the in/decrements the votes of the given comment_id",
+       "DELETE":"Deletes the given comment_id from the database"
+    },
+    "Users: /api/users":{  
+       "GET":"Gives a list of all users",
+       "POST":"Given a json with username, name and avatar_url, it inserts user into the database (if username is not already in use) and returns inserted user"
+    },
+    "User: /api/users/:username":{  
+       "GET":"Give a valid username, it returns name, avatar_url and username"
+    },
+    "API: /api":{  
+       "GET":"Returns all possible api end points"
+    }
+ }
