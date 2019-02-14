@@ -80,7 +80,6 @@ const getArticleById = (req, res, next) => {
       }
     })
     .catch((error) => {
-      console.log(error);
       const err = { status: sqlErrorMap[error.code] || 404, msg: error.detail };
       next(err);
     });

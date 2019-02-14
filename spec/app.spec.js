@@ -72,7 +72,7 @@ describe('End point tests', () => {
         return request
           .post('/api/topics')
           .send(newTopic)
-          .expect(400)
+          .expect(422)
           .then((res) => {
             expect(res.body.msg).to.equal('Key (slug)=(mitch) already exists.');
           });
@@ -563,7 +563,7 @@ describe('End point tests', () => {
         return request
           .post('/api/users')
           .send(newUser)
-          .expect(400)
+          .expect(422)
           .then((res) => {
             expect(res.body.msg).to.equal('Key (username)=(butter_bridge) already exists.');
           });

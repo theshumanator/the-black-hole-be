@@ -24,7 +24,6 @@ exports.postTopic = (req, res, next) => {
       }
     })
     .catch((error) => {
-      console.log(error.code);
       const err = { status: sqlErrorMap[error.code] || 422, msg: error.detail };
       next(err);
     });

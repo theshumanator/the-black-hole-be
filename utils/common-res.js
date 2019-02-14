@@ -1,7 +1,6 @@
 
 exports.sqlErrorMap = {
   23503: 404,
-  23505: 400,
 };
 
 exports.unhandledMethod = (req, res) => {
