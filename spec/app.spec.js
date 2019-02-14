@@ -28,7 +28,7 @@ describe('End point tests', () => {
         .get('/api')
         .expect(200)
         .then((res) => {
-          expect(res.body).to.contain.keys('Topics', 'Articles', 'Article', 'Comments of article', 'Comments', 'Users', 'User', 'API');
+          expect(res.body).to.contain.keys('Topics: /api/topics', 'Articles: /api/articles', 'Article: /api/articles/:article_id', 'Comments of article: /api/articles/:article_id/comments', 'Comments: /api/comments/:comment_id', 'Users: /api/users', 'User: /api/users/:username', 'API: /api');
         }));
     });
     describe('POST /api', () => {
