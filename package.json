@@ -13,7 +13,8 @@
     "migrate-rollback": "npx knex migrate:rollback",
     "migrate-latest": "npx knex migrate:latest",
     "migrate-update": "npx knex migrate:rollback && npx knex migrate:latest",
-    "seed": "npx knex seed:run"
+    "seed": "npx knex seed:run",
+    "start": "node listen.js"
   },
   "repository": {
     "type": "git",
