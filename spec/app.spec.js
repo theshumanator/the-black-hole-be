@@ -141,9 +141,9 @@ describe('End point tests', () => {
         .then((res) => {
           const { articles } = res.body;
           expect(articles.length).to.equal(1);
-          expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count', 'total_count');
+          expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');
           expect(articles[0].author).to.equal('butter_bridge');
-          expect(articles[0].total_count).to.equal(3);
+          expect(res.body.total_count).to.equal(3);
         }));
     });
 

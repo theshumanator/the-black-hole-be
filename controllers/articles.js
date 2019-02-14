@@ -20,8 +20,12 @@ const getArticles = (req, res, next) => {
               const err = { status: 404, msg: 'No articles available' };
               next(err);
             } else {
-              articles[0].total_count = +articleCount;
-              res.status(200).json({ articles });
+              const articleObj = {
+                articles,
+                total_count: +articleCount,
+              };
+
+              res.status(200).json(articleObj);
             }
           })
           .catch((error) => {
