@@ -102,7 +102,6 @@ describe('End point tests', () => {
           expect(article.author).to.equal('butter_bridge');
         }));
 
-
       it('Returns all articles for a given author with all the reqd keys', () => request
         .get('/api/articles?author=butter_bridge')
         .expect(200)
