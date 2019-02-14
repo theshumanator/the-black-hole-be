@@ -1,6 +1,6 @@
 const {
   fetchAllArticles, getArticleCount, insertArticle, modifyVote,
-  removeArticle, fetchCommentsForArticle,
+  removeArticle, fetchCommentsForArticle, fetchAllArticleById,
   insertCommentForArticle,
 } = require('../models/articles');
 
@@ -73,7 +73,7 @@ const postArticle = (req, res, next) => {
 };
 
 const getArticleById = (req, res, next) => {
-  fetchAllArticles(req.params)
+  fetchAllArticleById(req.params)
     .then((articles) => {
       if (articles.length === 0) {
         const err = { status: 404, msg: `Article does not exist for given article id: ${req.params.article_id}` };

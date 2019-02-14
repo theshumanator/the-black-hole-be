@@ -91,6 +91,18 @@ describe('End point tests', () => {
 
   describe('/api/articles', () => {
     describe('GET /api/articles', () => {
+      it('Returns all articles for a given article_idwith all the reqd keys', () => request
+        .get('/api/articles/1')
+        .expect(200)
+        .then((res) => {
+          const { article } = res.body;
+          expect(article).to.be.an('object');
+          expect(article).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count', 'body');
+          expect(article.article_id).to.equal(1);
+          expect(article.author).to.equal('butter_bridge');
+        }));
+
+
       it('Returns all articles for a given author with all the reqd keys', () => request
         .get('/api/articles?author=butter_bridge')
         .expect(200)
