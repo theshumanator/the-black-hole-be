@@ -3,10 +3,14 @@ const topicsRouter = require('./topics/topicsRouter');
 const commentsRouter = require('./comments/commentsRouter');
 const articlesRouter = require('./articles/articlesRouter');
 const usersRouter = require('./users/usersRouter');
+const loginRouter = require('./loginRouter');
+const secretsRouter = require('./secretsRouter');
 
 const { sendAPIInfo } = require('../controllers/apiGateway');
 const { unhandledMethod } = require('../utils/errors');
 
+apiRouter.use('/login', loginRouter);
+apiRouter.use('/secrets', secretsRouter);
 apiRouter.use('/topics', topicsRouter);
 apiRouter.use('/articles', articlesRouter);
 apiRouter.use('/comments', commentsRouter);

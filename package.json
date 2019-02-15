@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha spec",
+    "loginTest": "mocha ./spec/auth.spec.js",
     "lint": "eslint ./",
     "pre-commit": "npm t",
     "posttest": "npm run lint",
@@ -31,10 +32,14 @@
   },
   "homepage": "https://github.com/northcoders/BE2-NC-Knews#readme",
   "dependencies": {
-    "body-parser": "^1.18.3",    
+    "bcrypt": "^3.0.4",
+    "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
     "knex": "^0.15.2",
-    "pg": "^7.8.0"
+    "pg": "^7.8.0",
+    "pg-promise": "^8.5.5",
+    "superagent-defaults": "^0.1.14"
   },
   "devDependencies": {
     "eslint": "^5.9.0",
@@ -42,7 +47,7 @@
     "eslint-plugin-import": "^2.14.0",
     "nodemon": "^1.18.10",
     "chai": "^4.2.0",
-    "mocha": "^5.2.0",    
+    "mocha": "^5.2.0",
     "supertest": "^3.4.2",
     "husky": "^1.1.4"
   }

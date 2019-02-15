@@ -2,16 +2,27 @@ process.env.NODE_ENV = 'test';
 
 const { expect } = require('chai');
 const supertest = require('supertest');
+const defaults = require('superagent-defaults');
 const app = require('../app');
 const connection = require('../db/connection');
 
-const request = supertest(app);
-
+const request = defaults(supertest(app));
 
 describe('End point tests', () => {
-  beforeEach(() => connection.seed.run());
+  beforeEach(() => connection.seed.run()
+    .then(() => request
+      .post('/api/login')
+      .expect(200)
+      .send({ username: 'jimmy', password: 'J1immyz2' }))
+    .then(({ body: { token } }) => {
+      request.set('Authorization', `BEARER ${token}`);
+    })
+    .catch((error) => {
+    }));
 
-  after(() => connection.destroy());
+  after(() => {
+    connection.destroy();
+  });
 
   describe('GET /something', () => {
     it('Returns 404 unhandled route for a non-exstent endpoint', () => request
@@ -39,6 +50,51 @@ describe('End point tests', () => {
           expect(res.body.msg).to.equal('The method is not handled for this route');
         }));
     });
+  });
+
+  describe('/api/secrets', () => {
+    it('Responds with an array of secrets', () => request
+      .get('/api/secrets')
+      .expect(200)
+      .then(({ body: { secrets } }) => {
+        expect(secrets).to.be.an('Array');
+        expect(secrets[0]).to.have.all.keys(
+          'secret_id',
+          'secret_text',
+          'user_id',
+        );
+      }));
+    /*  it('GET responds with 401 if no token provided', () => request
+      .get('/api/secrets')
+      .set('Authorization', '')
+      .expect(401)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal('Unauthorised');
+      })); */
+  });
+
+  describe('/api/login', () => {
+    it('POST responds with an access token given correct username and password', () => request
+      .post('/api/login')
+      .send({ username: 'jimmy', password: 'J1immyz2' })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).to.have.ownProperty('token');
+      }));
+    it('POST responds with status 401 for an incorrect password', () => request
+      .post('/api/login')
+      .send({ username: 'mitch', password: 'wrongpassword' })
+      .expect(401)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal('invalid username or password');
+      }));
+    it('POST responds with status 401 for an incorrect username', () => request
+      .post('/api/login')
+      .send({ username: 'paul', password: 'secure123' })
+      .expect(401)
+      .then(({ body: { msg } }) => {
+        expect(msg).to.equal('invalid username or password');
+      }));
   });
 
   describe('/api/topics', () => {
@@ -388,6 +444,14 @@ describe('End point tests', () => {
         .expect(404)
         .then((res) => {
           expect(res.body.msg).to.equal('Key (article_id)=(1232323) is not present in table "articles".');
+        }));
+
+      it('Returns 400 when posting comments for non-existent article', () => request
+        .post('/api/articles/banana/comments')
+        .send(commentObj)
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).to.equal('The article id must be provided in the url like: api/articles/123/comments');
         }));
     });
   });

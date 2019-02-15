@@ -193,7 +193,7 @@ const getCommentsForArticle = (req, res, next) => {
   }
 };
 const postCommentForArticle = (req, res, next) => {
-  if (!('article_id' in req.params)) {
+  if (!('article_id' in req.params) || !(+req.params.article_id)) {
     const err = { status: 400, msg: 'The article id must be provided in the url like: api/articles/123/comments' };
     next(err);
   } else if (!('username' in req.body) || !('body' in req.body)) {
