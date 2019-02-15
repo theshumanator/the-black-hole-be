@@ -1,6 +1,6 @@
 const usersRouter = require('express').Router();
 const { getAllUsers, postUser, getUser } = require('../../controllers/users');
-const { unhandledMethod } = require('../../utils/common-res');
+const { unhandledMethod } = require('../../utils/errors');
 
 usersRouter.route('/')
   .get(getAllUsers)

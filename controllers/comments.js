@@ -1,12 +1,46 @@
-const { modifyVote, removeComment } = require('../models/comments');
-const { sqlErrorMap } = require('../utils/common-res');
+const { modifyVote, removeComment, getCommentById } = require('../models/comments');
+const { sqlErrorMap } = require('../utils/errors');
+
+const fetchCommentById = (req, res, next) => {
+  const comment_id = +req.params.comment_id;
+  getCommentById(comment_id)
+    .then((comments) => {
+      if (comments.length === 0) {
+        const err = { status: 404, msg: `Comment does not exist for given article id: ${comment_id}` };
+        next(err);
+      } else {
+        const comment = comments[0];
+        res.status(200).json({ comment });
+      }
+    })
+    .catch((error) => {
+      const err = { status: sqlErrorMap[error.code] || 404, msg: error.detail };
+      next(err);
+    });
+};
 
 exports.updateCommentVote = (req, res, next) => {
+  /*
+
   if (!('inc_votes' in req.body) || !(+req.body.inc_votes)) {
-    const err = { status: 400, msg: 'The inc_votes must be provided and must be integer' };
+    const err = { status: 400, msg: 'The inc_votes must be
+    provided and must be integer' };
     next(err);
   } else if (!('comment_id' in req.params)) {
+    const err = { status: 400, msg: 'The comment id must be
+    provided in the url like: api/comments/123' };
+    next(err);
+  } else {
+
+    block review: need to return unmodified comment
+  */
+  if (!('comment_id' in req.params)) {
     const err = { status: 400, msg: 'The comment id must be provided in the url like: api/comments/123' };
+    next(err);
+  } else if (!('inc_votes' in req.body)) {
+    fetchCommentById(req, res, next);
+  } else if (!(+req.body.inc_votes)) {
+    const err = { status: 400, msg: 'The inc_votes must be provided and must be integer' };
     next(err);
   } else {
     const voteDirection = req.body.inc_votes;

@@ -5,7 +5,7 @@ const articlesRouter = require('./articles/articlesRouter');
 const usersRouter = require('./users/usersRouter');
 
 const { sendAPIInfo } = require('../controllers/apiGateway');
-const { unhandledMethod } = require('../utils/common-res');
+const { unhandledMethod } = require('../utils/errors');
 
 apiRouter.use('/topics', topicsRouter);
 apiRouter.use('/articles', articlesRouter);

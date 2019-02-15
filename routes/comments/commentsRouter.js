@@ -1,6 +1,6 @@
 const commentsRouter = require('express').Router();
 const { updateCommentVote, deleteComment } = require('../../controllers/comments');
-const { unhandledMethod } = require('../../utils/common-res');
+const { unhandledMethod } = require('../../utils/errors');
 
 commentsRouter.route('/:comment_id')
   .patch(updateCommentVote)

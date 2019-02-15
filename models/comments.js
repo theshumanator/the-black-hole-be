@@ -11,4 +11,8 @@ const removeComment = comment_id => connection('comments')
   .returning('*');
 
 
-module.exports = { modifyVote, removeComment };
+const getCommentById = comment_id => connection('comments')
+  .select('*')
+  .where('comment_id', comment_id);
+
+module.exports = { modifyVote, removeComment, getCommentById };

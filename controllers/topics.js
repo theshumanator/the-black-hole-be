@@ -1,5 +1,5 @@
 const { fetchAllTopics, insertNewTopic } = require('../models/topics');
-const { sqlErrorMap } = require('../utils/common-res');
+const { sqlErrorMap } = require('../utils/errors');
 
 exports.getAllTopics = (req, res, next) => {
   fetchAllTopics()

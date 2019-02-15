@@ -1,10 +1,12 @@
 const { readJson } = require('../models/apiGateway');
+const { formError } = require('../utils/errors');
 
 exports.sendAPIInfo = (req, res, next) => {
   readJson((err, data) => {
     if (err) {
-      next({ status: 500, msg: 'Could not read api-info.json file' });
+      next(formError(err.code));
+    } else {
+      res.status(200).json(JSON.parse(data));
     }
-    return res.status(200).json(JSON.parse(data));
   });
 };

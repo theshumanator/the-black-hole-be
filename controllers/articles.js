@@ -4,7 +4,7 @@ const {
   insertCommentForArticle,
 } = require('../models/articles');
 
-const { sqlErrorMap } = require('../utils/common-res');
+const { sqlErrorMap } = require('../utils/errors');
 
 const getArticles = (req, res, next) => {
   getArticleCount(req.query)
@@ -108,11 +108,25 @@ const getArticleById = (req, res, next) => {
 };
 
 const updateArticleVote = (req, res, next) => {
-  if (!('inc_votes' in req.body) || !(+req.body.inc_votes)) {
-    const err = { status: 400, msg: 'Bad Request. inc_votes must be provided and must be an integer' };
+  /* if (!('inc_votes' in req.body) || !(+req.body.inc_votes)) {
+    const err = { status: 400, msg: 'Bad Request. inc_votes must
+     be provided and must be an integer' };
     next(err);
-  } else if (!('article_id' in req.params)) {
-    const err = { status: 400, msg: 'Bad Request. the article id must be provided in the url like: api/articles/123' };
+  }  else if (!('article_id' in req.params)) {
+    const err = { status: 400, msg: 'Bad Request. the article
+    id must be provided in the url like: /api/articles/123' };
+    next(err);
+  }
+  block review: need to return unmodified article if no vote provided
+  */
+
+  if (!('article_id' in req.params)) {
+    const err = { status: 400, msg: 'Bad Request. the article id must be provided in the url like: /api/articles/123' };
+    next(err);
+  } else if (!('inc_votes' in req.body)) {
+    getArticleById(req, res, next);
+  } else if (!(+req.body.inc_votes)) {
+    const err = { status: 400, msg: 'Bad Request. inc_votes must be provided and must be an integer' };
     next(err);
   } else {
     const voteDirection = req.body.inc_votes;

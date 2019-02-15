@@ -1,6 +1,7 @@
 const app = require('express')();
 const bodyParser = require('body-parser');
 const apiRouter = require('./routes/apiRouter');
+const { handleErrors } = require('./utils/errors');
 
 app.use(bodyParser.json());
 
@@ -15,8 +16,6 @@ app.all('/*', (req, res, next) => {
   next(err);
 });
 
-app.use((err, req, res, next) => {
-  res.status(err.status).send(err);
-});
+app.use(handleErrors);
 
 module.exports = app;

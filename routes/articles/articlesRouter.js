@@ -3,7 +3,7 @@ const {
   getArticles, postArticle, getArticleById, updateArticleVote,
   deleteArticle, getCommentsForArticle, postCommentForArticle,
 } = require('../../controllers/articles');
-const { unhandledMethod } = require('../../utils/common-res');
+const { unhandledMethod } = require('../../utils/errors');
 
 articlesRouter.route('/')
   .get(getArticles)

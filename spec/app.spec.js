@@ -456,12 +456,12 @@ describe('End point tests', () => {
           expect(res.body.msg).to.equal('Article does not exist for given article id: 1232323');
         }));
 
-      it('Returns 400 error for article vote update without inc_votes', () => request
+      it('Returns 200 and unmodified article if no inc_votes is provided', () => request
         .patch('/api/articles/1')
         .send({})
-        .expect(400)
-        .then((res) => {
-          expect(res.body.msg).to.equal('Bad Request. inc_votes must be provided and must be an integer');
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.article_id).to.equal(1);
         }));
 
       it('Returns 400 error for article vote set to non-integer', () => request
@@ -542,12 +542,12 @@ describe('End point tests', () => {
           expect(res.body.msg).to.equal('The comment_id 1232323 does not exist.');
         }));
 
-      it('Returns 400 inc_votes is not sent', () => request
+      it('Returns 200 inc_votes is not sent', () => request
         .patch('/api/comments/1')
         .send({})
-        .expect(400)
-        .then((res) => {
-          expect(res.body.msg).to.equal('The inc_votes must be provided and must be integer');
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment.comment_id).to.equal(1);
         }));
       it('Returns 400 inc_votes is not an integer', () => request
         .patch('/api/comments/1')

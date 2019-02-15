@@ -1,5 +1,5 @@
 const { fetchAllUsers, insertNewUser, findUser } = require('../models/users');
-const { sqlErrorMap } = require('../utils/common-res');
+const { sqlErrorMap } = require('../utils/errors');
 
 exports.getAllUsers = (req, res, next) => {
   fetchAllUsers()
