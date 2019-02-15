@@ -2,7 +2,7 @@
 
 This application provides an API service to interact with the NC-Knews system (read/write). 
 
-To see what APIs are supported, click on: [API]()
+To see what APIs are supported, click on: [API](https://shumanator-nc-knews.herokuapp.com/api)
 
 ## Getting Started
 
