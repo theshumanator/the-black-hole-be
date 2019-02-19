@@ -17,19 +17,16 @@ const fetchAllArticles = (userQuery, retry = false) => {
   let order = userQuery.order || 'desc';
 
 
-  const whereQuery = {};
+  let whereQuery = {};
   // if it is a retry, dont include anything in the where clause
   if (!retry) {
-    // TODO destrcture using reduce??
-    if ('author' in userQuery) {
-      whereQuery['a.author'] = userQuery.author;
-    }
-    if ('topic' in userQuery) {
-      whereQuery['a.topic'] = userQuery.topic;
-    }
-    if ('article_id' in userQuery) {
-      whereQuery['a.article_id'] = userQuery.article_id;
-    }
+    const queryKeys = ['author', 'topic', 'article_id'];
+    whereQuery = Object.keys(userQuery).reduce((acc, key) => {
+      if (queryKeys.includes(key)) {
+        acc[`a.${key}`] = userQuery[key];
+      }
+      return acc;
+    }, {});
   }
 
   if (isValidSort(sort_by)) {
@@ -61,16 +58,13 @@ const fetchAllArticleById = (userQuery) => {
   let sort_by = userQuery.sort_by || 'a.created_at';
   let order = userQuery.order || 'desc';
 
-  const whereQuery = { };
-  if ('author' in userQuery) {
-    whereQuery['a.author'] = userQuery.author;
-  }
-  if ('topic' in userQuery) {
-    whereQuery['a.topic'] = userQuery.topic;
-  }
-  if ('article_id' in userQuery) {
-    whereQuery['a.article_id'] = userQuery.article_id;
-  }
+  const queryKeys = ['author', 'topic', 'article_id'];
+  const whereQuery = Object.keys(userQuery).reduce((acc, key) => {
+    if (queryKeys.includes(key)) {
+      acc[`a.${key}`] = userQuery[key];
+    }
+    return acc;
+  }, {});
 
   if (isValidSort(sort_by)) {
     sort_by = `a.${sort_by}`;
@@ -96,17 +90,13 @@ const fetchAllArticleById = (userQuery) => {
 };
 
 const getArticleCount = (whereQuery) => {
-  const newWhereQuery = {};
-
-  if ('author' in whereQuery) {
-    newWhereQuery['a.author'] = whereQuery.author;
-  }
-  if ('topic' in whereQuery) {
-    newWhereQuery['a.topic'] = whereQuery.topic;
-  }
-  if ('article_id' in whereQuery) {
-    newWhereQuery['a.article_id'] = whereQuery.article_id;
-  }
+  const queryKeys = ['author', 'topic', 'article_id'];
+  const newWhereQuery = Object.keys(whereQuery).reduce((acc, key) => {
+    if (queryKeys.includes(key)) {
+      acc[`a.${key}`] = whereQuery[key];
+    }
+    return acc;
+  }, {});
 
   return connection
     .from('articles as a')
@@ -114,9 +104,10 @@ const getArticleCount = (whereQuery) => {
     .where(newWhereQuery);
 };
 
+/* replaced by generic
 const insertArticle = article => connection('articles')
   .insert(article)
-  .returning('*');
+  .returning('*'); */
 
 
 const modifyVote = (article_id, votes) => connection('articles')
@@ -144,17 +135,16 @@ const fetchCommentsForArticle = (userQuery, article_id) => {
     .limit(limit);
 };
 
+/* replaced by generic
 const insertCommentForArticle = commentObj => connection('comments')
   .insert(commentObj)
-  .returning('*');
+  .returning('*'); */
 
 module.exports = {
   fetchAllArticles,
   getArticleCount,
-  insertArticle,
   modifyVote,
   removeArticle,
   fetchCommentsForArticle,
-  insertCommentForArticle,
   fetchAllArticleById,
 };

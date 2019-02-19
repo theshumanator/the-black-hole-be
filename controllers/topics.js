@@ -1,8 +1,9 @@
-const { fetchAllTopics, insertNewTopic } = require('../models/topics');
+// const { fetchAllTopics, insertNewTopic } = require('../models/topics'); replaced with generic
+const { fetchAll, insertOne } = require('../models/generic');
 const { sqlErrorMap } = require('../utils/errors');
 
 exports.getAllTopics = (req, res, next) => {
-  fetchAllTopics()
+  fetchAll('topics')
     .then((topics) => {
       res.status(200).json({ topics });
     })
@@ -17,7 +18,7 @@ exports.postTopic = (req, res, next) => {
     const err = { status: 400, msg: 'Missing data in the json. JSON must include: slug and description' };
     next(err);
   }
-  insertNewTopic(req.body)
+  insertOne('topics', req.body)
     .then((topics) => {
       if (topics.length === 0) {
         const err = { status: 422, msg: 'Could not insert the topic. Contact support' };

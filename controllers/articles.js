@@ -1,9 +1,9 @@
 const {
-  fetchAllArticles, getArticleCount, insertArticle, modifyVote,
+  fetchAllArticles, getArticleCount, modifyVote,
   removeArticle, fetchCommentsForArticle, fetchAllArticleById,
-  insertCommentForArticle,
+  // replace with generic insertArticle, insertCommentForArticle,
 } = require('../models/articles');
-
+const { insertOne } = require('../models/generic');
 const { sqlErrorMap } = require('../utils/errors');
 
 const getArticles = (req, res, next) => {
@@ -68,7 +68,7 @@ const postArticle = (req, res, next) => {
       articleObj.votes = req.body.votes;
     }
 
-    insertArticle(articleObj)
+    insertOne('articles', articleObj)
       .then((articles) => {
         if (articles.length === 0) {
           const err = { status: 404, msg: 'Could not insert article. Contact support' };
@@ -208,7 +208,7 @@ const postCommentForArticle = (req, res, next) => {
       article_id,
     };
 
-    insertCommentForArticle(commentObj)
+    insertOne('comments', commentObj)
       .then((comments) => {
         if (comments.length === 0) {
           const err = { status: 404, msg: `Article does not exist for given article id: ${article_id}` };

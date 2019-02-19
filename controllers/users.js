@@ -1,8 +1,9 @@
-const { fetchAllUsers, insertNewUser, findUser } = require('../models/users');
+const { findUser } = require('../models/users'); // replaced these with generic fetchAllUsers, insertNewUser,
+const { fetchAll, insertOne } = require('../models/generic');
 const { sqlErrorMap } = require('../utils/errors');
 
 exports.getAllUsers = (req, res, next) => {
-  fetchAllUsers()
+  fetchAll('users')
     .then((users) => {
       res.status(200).json({ users });
     })
@@ -34,7 +35,8 @@ exports.postUser = (req, res, next) => {
     const err = { status: 400, msg: 'The username is missing in json.' };
     next(err);
   } else {
-    insertNewUser(req.body)
+    // insertNewUser(req.body)
+    insertOne('users', req.body)
       .then((users) => {
         if (users.length === 0) {
           const err = { status: 422, msg: 'Could not insert the user. Contact support' };

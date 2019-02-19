@@ -111,7 +111,7 @@ describe('End point tests', () => {
 
   describe('/api/articles', () => {
     describe('GET /api/articles', () => {
-      it('Returns all articles for a given article_idwith all the reqd keys', () => request
+      it('Returns all articles for a given article_id with all the reqd keys', () => request
         .get('/api/articles/1')
         .expect(200)
         .then(({ body: { article } }) => {
