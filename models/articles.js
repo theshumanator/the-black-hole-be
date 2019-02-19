@@ -32,7 +32,6 @@ const fetchAllArticles = (userQuery, retry = false) => {
     }
   }
 
-
   if (isValidSort(sort_by)) {
     sort_by = `a.${sort_by}`;
   } else {
@@ -42,7 +41,6 @@ const fetchAllArticles = (userQuery, retry = false) => {
   if (!isValidOrder(order)) {
     order = 'desc';
   }
-
 
   const offset = ((p * limit) - limit);
   return connection
@@ -73,7 +71,6 @@ const fetchAllArticleById = (userQuery) => {
   if ('article_id' in userQuery) {
     whereQuery['a.article_id'] = userQuery.article_id;
   }
-
 
   if (isValidSort(sort_by)) {
     sort_by = `a.${sort_by}`;
