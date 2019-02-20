@@ -83,7 +83,7 @@ describe('End point tests', () => {
           .send(newTopic)
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('Missing data in the json. JSON must include: slug and description');
+            expect(msg).to.equal('description is missing from json');
           });
       });
 
@@ -94,7 +94,7 @@ describe('End point tests', () => {
           .send(newTopic)
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('Missing data in the json. JSON must include: slug and description');
+            expect(msg).to.equal('slug is missing from json');
           });
       });
     });
@@ -197,7 +197,7 @@ describe('End point tests', () => {
           });
       });
 
-      it('Returns 404 error when posting article with missing username', () => {
+      it('Returns 400 error when posting article with missing username', () => {
         const article = {
           title: 'Something funny',
           body: 'Hey there. I am supposed to be funny.',
@@ -208,7 +208,7 @@ describe('End point tests', () => {
           .send(article)
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('Missing data in the json. JSON must include: title, body, topic and username');
+            expect(msg).to.equal('username is missing from json');
           });
       });
 
@@ -323,7 +323,7 @@ describe('End point tests', () => {
         .get('/api/articles/hola/comments')
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).to.equal('The article id must be provided in the url like: api/articles/123/comments and must be an integer');
+          expect(msg).to.equal('article_id must be included in the url and must be an integer');
         }));
     });
 
@@ -351,7 +351,7 @@ describe('End point tests', () => {
           .send(comment)
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('JSON needs a username and body');
+            expect(msg).to.equal('body is missing from json');
           });
       });
       it('Returns 404 when posting comments for non-existent user', () => {
@@ -398,7 +398,7 @@ describe('End point tests', () => {
         .get('/api/articles/hola')
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).to.equal('Article id: hola must be an integer.');
+          expect(msg).to.equal('article_id must be included in the url and must be an integer');
         }));
     });
 
@@ -464,7 +464,7 @@ describe('End point tests', () => {
         .delete('/api/articles/hola')
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).to.equal('The article id must be an integer and provided in the url like: api/articles/123');
+          expect(msg).to.equal('article_id must be included in the url and must be an integer');
         }));
       it('Returns 400 for non existent int article id', () => request
         .delete('/api/articles/12345')
@@ -535,6 +535,13 @@ describe('End point tests', () => {
         .then(({ body: { msg } }) => {
           expect(msg).to.equal('The inc_votes must be provided and must be integer');
         }));
+      it('Returns 400 if passed comment id is not numeric', () => request
+        .patch('/api/comments/abc')
+        .send(decreaseVote)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal('comment_id must be provided in the url like: api/comments/123');
+        }));
     });
 
     // TODO do a check to see if comment_id is still there?
@@ -592,7 +599,7 @@ describe('End point tests', () => {
           .send(newUser)
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('The username is missing in json.');
+            expect(msg).to.equal('username is missing from json');
           });
       });
 

@@ -1,9 +1,12 @@
 const app = require('express')();
 const bodyParser = require('body-parser');
+const expressValidator = require('express-validator');
 const apiRouter = require('./routes/apiRouter');
+
 const { handleErrors } = require('./utils/errors');
 
 app.use(bodyParser.json());
+app.use(expressValidator());
 
 app.use('/api', apiRouter);
 
