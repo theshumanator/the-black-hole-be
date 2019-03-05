@@ -7,20 +7,24 @@ exports.postTopic = (req, res, next) => {
     .getValidationResult()
     .then(validationHandler())
     .then(() => {
-      insertOne('topics', req.body)
-        .then((topics) => {
-          if (topics.length === 0) {
-            Promise.reject({ status: 422, msg: 'Could not insert the topic. Contact support' });
+      if (req.body.slug === '') {
+        Promise.reject({ status: 400, msg: 'Topic slug/mname cannot be blank.' });
+      } else {
+        insertOne('topics', req.body)
+          .then((topics) => {
+            if (topics.length === 0) {
+              Promise.reject({ status: 422, msg: 'Could not insert the topic. Contact support' });
             // next(err);
-          } else {
-            const topic = topics[0];
-            res.status(201).json({ topic });
-          }
-        })
-        .catch((error) => {
-          const err = { status: sqlErrorMap[error.code] || 422, msg: error.detail };
-          next(err);
-        });
+            } else {
+              const topic = topics[0];
+              res.status(201).json({ topic });
+            }
+          })
+          .catch((error) => {
+            const err = { status: sqlErrorMap[error.code] || 422, msg: error.detail };
+            next(err);
+          });
+      }
     })
     .catch(next);
 };
