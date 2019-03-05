@@ -10,7 +10,7 @@ const isValidOrder = (order) => {
   return validOrder.includes(order);
 };
 
-const fetchAllArticles = (userQuery, retry = false) => {
+const fetchAllArticles = (userQuery) => {
   const limit = userQuery.limit || 10;
   const p = userQuery.p || 1;
   let sort_by = userQuery.sort_by || 'a.created_at';
@@ -18,16 +18,14 @@ const fetchAllArticles = (userQuery, retry = false) => {
 
 
   let whereQuery = {};
-  // if it is a retry, dont include anything in the where clause
-  if (!retry) {
-    const queryKeys = ['author', 'topic', 'article_id'];
-    whereQuery = Object.keys(userQuery).reduce((acc, key) => {
-      if (queryKeys.includes(key)) {
-        acc[`a.${key}`] = userQuery[key];
-      }
-      return acc;
-    }, {});
-  }
+  const queryKeys = ['author', 'topic', 'article_id'];
+  whereQuery = Object.keys(userQuery).reduce((acc, key) => {
+    if (queryKeys.includes(key)) {
+      acc[`a.${key}`] = userQuery[key];
+    }
+    return acc;
+  }, {});
+
 
   if (isValidSort(sort_by)) {
     sort_by = `a.${sort_by}`;

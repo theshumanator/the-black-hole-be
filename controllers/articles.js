@@ -18,22 +18,8 @@ const getArticles = (req, res, next) => {
         fetchAllArticles(req.query)
           .then((articles) => {
             if (articles.length === 0) {
-              /* block review expect it to be 200 not 404
-              const err = { status: 404, msg: 'No articles available' };
-              next(err); */
-              fetchAllArticles(req.query, true)
-                .then((allArticles) => {
-                  if (allArticles.length === 0) {
-                    const err = { status: 404, msg: 'There are no articles in the database' };
-                    next(err);
-                  } else {
-                    const articleObj = {
-                      articles: allArticles,
-                      total_count: +articleCount,
-                    };
-                    res.status(200).json(articleObj);
-                  }
-                });
+              const err = { status: 404, msg: 'No articles foound for your query' };
+              next(err);
             } else {
               const articleObj = {
                 articles,

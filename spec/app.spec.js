@@ -131,15 +131,6 @@ describe('End point tests', () => {
           expect(articles[0].author).to.equal('butter_bridge');
         }));
 
-      it('Returns all articles if topic does not exist', () => request
-        .get('/api/articles?topic=wiii')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).to.be.an('array');
-          expect(articles[0]).to.be.an('object');
-          expect(articles[0]).to.contain.keys('article_id', 'title', 'topic', 'votes', 'author', 'created_at', 'comment_count');
-        }));
-
       it('Returns articles sorted as request', () => request
         .get('/api/articles?sort_by=article_id&order=desc')
         .expect(200)
