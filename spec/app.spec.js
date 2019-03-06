@@ -307,7 +307,7 @@ describe('End point tests', () => {
         .get('/api/articles/1232323/comments')
         .expect(404)
         .then(({ body: { msg } }) => {
-          expect(msg).to.equal('Article does not exist for given article id: 1232323');
+          expect(msg).to.equal('Article 1232323 does not have any comments');
         }));
 
       it('Returns 400 when fetching comments for invalid article id', () => request

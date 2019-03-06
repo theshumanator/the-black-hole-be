@@ -102,6 +102,11 @@ const getArticleCount = (whereQuery) => {
     .where(newWhereQuery);
 };
 
+const getCommentsForArticleCount = whereQuery => connection
+  .from('comments as c')
+  .count('c.comment_id as total_count')
+  .where(whereQuery);
+
 /* replaced by generic
 const insertArticle = article => connection('articles')
   .insert(article)
@@ -133,6 +138,7 @@ const fetchCommentsForArticle = (userQuery, article_id) => {
     .limit(limit);
 };
 
+
 /* replaced by generic
 const insertCommentForArticle = commentObj => connection('comments')
   .insert(commentObj)
@@ -145,4 +151,5 @@ module.exports = {
   removeArticle,
   fetchCommentsForArticle,
   fetchAllArticleById,
+  getCommentsForArticleCount,
 };

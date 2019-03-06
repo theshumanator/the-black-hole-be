@@ -1,6 +1,7 @@
 const {
   fetchAllArticles, getArticleCount, modifyVote,
   removeArticle, fetchCommentsForArticle, fetchAllArticleById,
+  getCommentsForArticleCount,
   // replace with generic insertArticle, insertCommentForArticle,
 } = require('../models/articles');
 const { insertOne } = require('../models/generic');
@@ -169,13 +170,26 @@ const getCommentsForArticle = (req, res, next) => {
     .then(validationHandler())
     .then(() => {
       const article_id = +req.params.article_id;
-      fetchCommentsForArticle(req.query, article_id)
-        .then((comments) => {
-          if (comments.length === 0) {
-            const err = { status: 404, msg: `Article does not exist for given article id: ${article_id}` };
+      getCommentsForArticleCount({ article_id })
+        .then((totalCount) => {
+          if (totalCount.length === 0) {
+            const err = { status: 404, msg: 'There are no articles in the database' };
             next(err);
           } else {
-            res.status(200).json({ comments });
+            const commentCount = totalCount[0].total_count;
+            fetchCommentsForArticle(req.query, article_id)
+              .then((comments) => {
+                if (comments.length === 0) {
+                  const err = { status: 404, msg: `Article ${article_id} does not have any comments` };
+                  next(err);
+                } else {
+                  res.status(200).json({ comments, total_count: +commentCount });
+                }
+              })
+              .catch((error) => {
+                const err = { status: sqlErrorMap[error.code] || 404, msg: error.detail };
+                next(err);
+              });
           }
         })
         .catch((error) => {
